@@ -65,17 +65,4 @@ This repository is optimized for AI coding assistants using **Graphify**.
 ---
 
 Developed with ❤️ by the FireHox Team.
-- [2025-02-26T14:17:33] style: enhance README formatting and badge definitions
-- [2025-03-04T14:19:58] docs(readme): improve documentation notes and usage guidelines
-- [2025-05-02T17:10:54] style: enhance README formatting and badge definitions
-- [2025-06-11T13:37:00] docs(readme): improve documentation notes and usage guidelines
-- [2025-09-09T14:16:42] docs(readme): improve documentation notes and usage guidelines
-- [2025-10-29T10:54:40] docs(readme): improve documentation notes and usage guidelines
-- [2025-11-06T14:09:59] style: enhance README formatting and badge definitions
-- [2025-12-04T20:51:32] docs(readme): improve documentation notes and usage guidelines
-- [2026-01-23T11:42:57] docs(readme): improve documentation notes and usage guidelines
-- [2026-02-16T22:09:46] style: enhance README formatting and badge definitions
-- [2026-03-23T09:06:26] docs(readme): improve documentation notes and usage guidelines
-- [2026-04-24T09:10:26] style: enhance README formatting and badge definitions
-- [2026-06-30T16:58:56] style: enhance README formatting and badge definitions
-- [2026-07-01T20:07:06] docs(readme): improve documentation notes and usage guidelines
+<!-- [2025-01-23T18:11:50] docs(readme): update project documentation and overview -->
