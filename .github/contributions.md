@@ -90,3 +90,4 @@
 - [2025-01-12T14:42:54] perf: improve execution speed in hot paths
 - [2025-01-15T15:54:41] chore: update dependencies and environment config
 - [2025-01-20T16:57:19] feat: add utility methods for state management
+- [2025-01-29T18:24:10] chore: update dependencies and environment config
