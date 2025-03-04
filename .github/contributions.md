@@ -103,3 +103,4 @@
 - [2025-02-27T18:48:28] refactor: optimize internal helper functions
 - [2025-02-27T20:11:00] chore: update configuration and build scripts
 - [2025-02-28T09:47:00] chore: update configuration and build scripts
+- [2025-03-04T21:40:24] chore: update configuration and build scripts
