@@ -110,3 +110,4 @@
 - [2025-03-26T14:47:47] style: improve code formatting and comments
 - [2025-03-28T16:32:46] feat: add utility methods for state management
 - [2025-03-31T15:24:39] fix: correct minor typo in logging output
+- [2025-04-01T20:02:27] refactor: optimize internal helper functions
