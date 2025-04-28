@@ -118,3 +118,4 @@
 - [2025-04-24T19:38:45] fix: correct minor typo in logging output
 - [2025-04-26T22:01:36] chore: update configuration and build scripts
 - [2025-04-28T11:38:19] chore: update dependencies and environment config
+- [2025-04-28T19:51:06] refactor: clean up unused variables and imports
