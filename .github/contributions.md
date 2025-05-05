@@ -124,3 +124,4 @@
 - [2025-04-30T10:29:20] refactor: clean up unused variables and imports
 - [2025-05-01T11:42:04] fix: resolve edge cases in parameter validation
 - [2025-05-04T21:52:38] chore: update configuration and build scripts
+- [2025-05-05T10:43:33] feat: add utility methods for state management
