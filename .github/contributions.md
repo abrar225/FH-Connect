@@ -128,3 +128,4 @@
 - [2025-05-09T13:41:26] fix: resolve edge cases in parameter validation
 - [2025-05-20T21:11:47] refactor: clean up unused variables and imports
 - [2025-05-25T15:31:09] fix: correct minor typo in logging output
+- [2025-05-27T10:38:26] docs: clarify API usage examples in documentation
