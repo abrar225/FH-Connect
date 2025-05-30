@@ -130,3 +130,4 @@
 - [2025-05-25T15:31:09] fix: correct minor typo in logging output
 - [2025-05-27T10:38:26] docs: clarify API usage examples in documentation
 - [2025-05-27T18:40:05] chore: update dependencies and environment config
+- [2025-05-30T11:00:28] docs: update activity log and documentation
