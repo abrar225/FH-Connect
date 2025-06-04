@@ -133,3 +133,4 @@
 - [2025-05-30T11:00:28] docs: update activity log and documentation
 - [2025-05-30T12:33:15] feat: add utility methods for state management
 - [2025-05-30T16:11:48] feat: add utility methods for state management
+- [2025-06-04T18:10:13] chore: update dependencies and environment config
