@@ -68,3 +68,4 @@ Developed with ❤️ by the FireHox Team.
 - [2025-02-26T14:17:33] style: enhance README formatting and badge definitions
 - [2025-03-04T14:19:58] docs(readme): improve documentation notes and usage guidelines
 - [2025-05-02T17:10:54] style: enhance README formatting and badge definitions
+- [2025-06-11T13:37:00] docs(readme): improve documentation notes and usage guidelines
