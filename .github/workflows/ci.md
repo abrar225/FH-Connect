@@ -5,3 +5,4 @@
 - [2026-03-18T12:06:53] ci: refine automated build workflow documentation
 <!-- [2025-01-02T18:38:45] ci: update automated test pipeline docs -->
 <!-- [2025-03-27T13:30:24] ci: update automated test pipeline docs -->
+<!-- [2025-06-24T22:14:39] ci: update automated test pipeline docs -->
