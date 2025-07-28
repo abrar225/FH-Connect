@@ -147,3 +147,4 @@
 - [2025-07-22T21:26:15] refactor: clean up unused variables and imports
 - [2025-07-27T22:43:35] fix: correct minor typo in logging output
 - [2025-07-28T16:57:33] chore: update dependencies and environment config
+- [2025-07-28T19:08:39] feat: add utility methods for state management
