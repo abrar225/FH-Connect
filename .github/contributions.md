@@ -9,3 +9,4 @@
 - [2025-09-12T11:22:38] refactor: clean up unused variables and imports
 - [2025-09-15T09:55:34] refactor: clean up unused variables and imports
 - [2025-09-22T11:44:32] refactor: clean up unused variables and imports
+- [2025-09-22T16:00:58] test: expand test coverage for utility modules
