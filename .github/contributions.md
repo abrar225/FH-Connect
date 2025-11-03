@@ -15,3 +15,4 @@
 - [2025-10-23T19:33:23] docs: clarify API usage examples in documentation
 - [2025-10-27T13:04:57] perf: improve execution speed in hot paths
 - [2025-10-29T17:01:51] style: improve code formatting and comments
+- [2025-11-03T21:27:09] docs: clarify API usage examples in documentation
