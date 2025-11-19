@@ -74,3 +74,4 @@ Developed with ❤️ by the FireHox Team.
 <!-- [2025-07-01T12:33:23] style: improve formatting and badge alignment -->
 <!-- [2025-08-02T22:44:34] docs(readme): update project documentation and overview -->
 <!-- [2025-10-16T10:28:03] docs(readme): update project documentation and overview -->
+<!-- [2025-11-19T11:01:30] docs(readme): update project documentation and overview -->
