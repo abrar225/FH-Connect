@@ -23,3 +23,4 @@
 - [2025-11-24T18:02:51] feat: add utility methods for state management
 - [2025-12-13T19:54:17] test: expand test coverage for utility modules
 - [2025-12-24T12:08:10] test: expand test coverage for utility modules
+- [2025-12-24T15:23:26] docs: clarify API usage examples in documentation
