@@ -25,3 +25,4 @@
 - [2025-12-24T12:08:10] test: expand test coverage for utility modules
 - [2025-12-24T15:23:26] docs: clarify API usage examples in documentation
 - [2025-12-25T18:44:56] docs: update activity log and documentation
+- [2025-12-28T18:58:31] fix: resolve edge cases in parameter validation
