@@ -75,3 +75,4 @@ Developed with ❤️ by the FireHox Team.
 <!-- [2025-08-02T22:44:34] docs(readme): update project documentation and overview -->
 <!-- [2025-10-16T10:28:03] docs(readme): update project documentation and overview -->
 <!-- [2025-11-19T11:01:30] docs(readme): update project documentation and overview -->
+<!-- [2026-01-07T11:48:56] docs(readme): update project documentation and overview -->
