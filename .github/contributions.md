@@ -42,3 +42,4 @@
 - [2026-02-12T12:38:07] refactor: optimize internal helper functions
 - [2026-02-12T16:53:35] fix: correct minor typo in logging output
 - [2026-02-19T18:41:59] refactor: optimize internal helper functions
+- [2026-02-27T12:53:32] chore: update dependencies and environment config
