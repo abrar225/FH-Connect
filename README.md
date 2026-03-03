@@ -80,3 +80,4 @@ Developed with ❤️ by the FireHox Team.
 <!-- [2026-02-08T19:03:31] style: improve formatting and badge alignment -->
 <!-- [2026-02-08T22:36:29] style: improve formatting and badge alignment -->
 <!-- [2026-02-17T18:09:24] style: improve formatting and badge alignment -->
+<!-- [2026-03-03T22:54:00] style: improve formatting and badge alignment -->
