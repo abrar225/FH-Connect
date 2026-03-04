@@ -43,3 +43,4 @@
 - [2026-02-12T16:53:35] fix: correct minor typo in logging output
 - [2026-02-19T18:41:59] refactor: optimize internal helper functions
 - [2026-02-27T12:53:32] chore: update dependencies and environment config
+- [2026-03-04T13:06:33] docs: clarify API usage examples in documentation
