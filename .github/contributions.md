@@ -45,3 +45,4 @@
 - [2026-02-27T12:53:32] chore: update dependencies and environment config
 - [2026-03-04T13:06:33] docs: clarify API usage examples in documentation
 - [2026-03-06T22:03:35] docs: clarify API usage examples in documentation
+- [2026-03-12T13:29:37] perf: improve execution speed in hot paths
