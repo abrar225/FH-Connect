@@ -14,3 +14,4 @@
 <!-- [2026-02-22T14:20:10] docs(changelog): update version release notes -->
 <!-- [2026-02-25T14:24:31] docs(changelog): update version release notes -->
 <!-- [2026-03-12T13:09:34] docs(changelog): update version release notes -->
+<!-- [2026-03-16T21:13:03] fix: minor edge case handling in config parser -->
