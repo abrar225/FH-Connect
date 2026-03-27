@@ -47,3 +47,4 @@
 - [2026-03-06T22:03:35] docs: clarify API usage examples in documentation
 - [2026-03-12T13:29:37] perf: improve execution speed in hot paths
 - [2026-03-23T09:50:49] chore: update configuration and build scripts
+- [2026-03-27T21:50:56] chore: update dependencies and environment config
