@@ -51,3 +51,4 @@
 - [2026-04-05T09:09:51] perf: improve execution speed in hot paths
 - [2026-04-10T21:08:29] style: improve code formatting and comments
 - [2026-04-13T16:10:41] chore: update configuration and build scripts
+- [2026-04-13T17:47:41] docs: clarify API usage examples in documentation
