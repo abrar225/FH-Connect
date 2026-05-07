@@ -1,0 +1,276 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  --color-surface: #18181b;
+  --color-surface-raised: #27272a;
+  --color-primary: #3b82f6;
+}
+
+@layer base {
+  :root {
+    --background: #09090b;
+    --foreground: #fafafa;
+    --surface: #18181b;
+    --surface-raised: #27272a;
+    --primary: #3b82f6;
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Webkit Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Glassmorphism Utilities */
+@layer utilities {
+  .glass-panel {
+    @apply bg-surface/60 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+  .glass-button {
+    @apply bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/5 transition-all duration-200;
+  }
+}
+
+/* =========================================
+   LiveKit overrides — blend into our theme
+   ========================================= */
+[data-lk-theme="default"] {
+  --lk-bg: transparent !important;
+  --lk-bg2: rgba(24, 24, 27, 0.6) !important;
+  --lk-control-bg: transparent !important;
+}
+
+/* Participant tiles */
+.lk-participant-tile {
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(24, 24, 27, 0.5) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+.lk-participant-tile:hover {
+  transform: scale(1.01);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08) !important;
+}
+
+/* Participant name label */
+.lk-participant-name {
+  background: rgba(24, 24, 27, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border-radius: 0.5rem !important;
+  padding: 2px 10px !important;
+  font-size: 0.75rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Grid layout gaps */
+.lk-grid-layout {
+  gap: 0.75rem !important;
+  padding: 0.5rem !important;
+}
+
+/* Hide default LiveKit controls (we use our own) */
+.lk-control-bar {
+  display: none !important;
+}
+
+/* =========================================
+   Custom Animations
+   ========================================= */
+
+/* Slide-in for new transcription lines */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scale-in for new draft cards */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-scale-in {
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glow pulse for active recording */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+}
+.animate-glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Shimmer for loading skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Toast slide-in from top */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+.animate-toast-in {
+  animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-toast-out {
+  animation: toastOut 0.25s ease-in forwards;
+}
+
+/* =========================================
+   Neo-Brutalist Landing Page & Lenis
+   ========================================= */
+
+.landing-page {
+  font-family: var(--font-manrope);
+  background-color: #050505;
+  color: #e1e1e1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.landing-page * {
+  cursor: none;
+}
+
+.landing-page a, .landing-page button, .landing-page .interactive {
+  cursor: none;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.font-heading {
+  font-family: var(--font-syne);
+}
+
+.font-serif-italic {
+  font-family: var(--font-playfair);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  mix-blend-mode: exclusion;
+  transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), height 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor.hovered {
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  mix-blend-mode: exclusion;
+}
+
+.video-grain {
+  background-image: repeating-radial-gradient(
+    circle at 50% 50%,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.05) 1px,
+    transparent 2px,
+    transparent 100%
+  );
+  background-size: 10px 10px;
+}
