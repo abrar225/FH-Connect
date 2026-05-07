@@ -1,0 +1,582 @@
+{
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/next.config.mjs": {
+    "mtime": 1778085450.6824286,
+    "hash": "1c3aa4b3346bd1240c8ced95365da545"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/next-env.d.ts": {
+    "mtime": 1778131140.0389407,
+    "hash": "2a74d3909800ca5467fa83b0ab4a4890"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/tailwind.config.ts": {
+    "mtime": 1774966144.0,
+    "hash": "6c640005964fbf46e4d96d4ee946f374"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/postcss.config.js": {
+    "mtime": 1774966366.0,
+    "hash": "a00d3fff735a49ccf3cdb6e90a9d8df3"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/eslint.config.mjs": {
+    "mtime": 1778003526.0856853,
+    "hash": "f98ce7f2eca793831ed2aaf7c14c8c57"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/layout.tsx": {
+    "mtime": 1775245150.0,
+    "hash": "6d4029da431f6caf7eb4a432978640a4"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/page.tsx": {
+    "mtime": 1775245249.0,
+    "hash": "74d660e1af11def8f98a242e7212649e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/room/[roomId]/page.tsx": {
+    "mtime": 1778003078.590284,
+    "hash": "bb7bffb32ab3a6564c780e8422da6242"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/context/AuthContext.tsx": {
+    "mtime": 1778126246.5615313,
+    "hash": "c0e480ba974cb19a4514ef223ab8f45c"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/dashboard/layout.tsx": {
+    "mtime": 1778126240.7037039,
+    "hash": "4e687e662a2d41884b64200814966b54"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/dashboard/page.tsx": {
+    "mtime": 1778087693.5190399,
+    "hash": "469d20d0d1b993c4fa37acc914c8f736"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/dashboard/settings/page.tsx": {
+    "mtime": 1778124860.8786058,
+    "hash": "cc811dcae2969858b6e3c1f098e8eb36"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/dashboard/recordings/page.tsx": {
+    "mtime": 1778068435.7596714,
+    "hash": "c4ea14ffa3d72e020c19e4bb72d71fbd"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/dashboard/actions/page.tsx": {
+    "mtime": 1778068599.5670736,
+    "hash": "f68aa9da8b5ab18d75c337b7b924cdbc"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/dashboard/meetings/page.tsx": {
+    "mtime": 1778087693.5679493,
+    "hash": "cc1a9dbbb77585dd1f6c9598a18d9d17"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/dashboard/reports/page.tsx": {
+    "mtime": 1778087693.6165965,
+    "hash": "ba38c4cd7ddc5b814cfc72d43fa58b92"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/ui/GlassContainer.tsx": {
+    "mtime": 1775098713.0,
+    "hash": "129a787faefeda749a972aad265448e7"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/ui/ToastProvider.tsx": {
+    "mtime": 1775289300.0,
+    "hash": "3d8cddf5a5f6ffcb371b01638b8a96ad"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/room/PreLobby.tsx": {
+    "mtime": 1778002990.9100664,
+    "hash": "46a543c0048aa1adf438b370b761dce6"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/dashboard/ScheduleMeetingModal.tsx": {
+    "mtime": 1778087693.6737678,
+    "hash": "5352867e05d781e99375bce29e740a2e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/dashboard/JoinMeetingModal.tsx": {
+    "mtime": 1775244567.0,
+    "hash": "1614c275119eed374794f52de7227612"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/MeetingPulse.tsx": {
+    "mtime": 1778131623.0709794,
+    "hash": "4315eea50887ddd23e9140147b386312"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/FeatureSidebar.tsx": {
+    "mtime": 1778068612.2593038,
+    "hash": "a33f7801b7368f70fb4127132f6109da"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/TranscriptionSidebar.tsx": {
+    "mtime": 1778131631.8782535,
+    "hash": "c5f7f125b0675ef2d9c5bc5f4424ce95"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/ReportCard.tsx": {
+    "mtime": 1778003143.2133343,
+    "hash": "3a8ee4b4f27dae5f8554304f1fd7bbe6"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/FloatingCaptions.tsx": {
+    "mtime": 1777905696.8091738,
+    "hash": "b4c28b6103eea60923620343af2d699b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/SpeakerBlock.tsx": {
+    "mtime": 1775019030.0,
+    "hash": "74258aba466bda40c05cec8f47e75873"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/VideoGrid.tsx": {
+    "mtime": 1774966224.0,
+    "hash": "b48ab8f3a8a7fcc5421687339e56fff3"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/MeetingControlBar.tsx": {
+    "mtime": 1778003078.4842517,
+    "hash": "70d360dfa7f77a606f39c1d858ae69ae"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/DraftCard.tsx": {
+    "mtime": 1778003078.4586442,
+    "hash": "95f3c273e9ac72e4a18cbed35d4f2877"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/components/meeting/MeetingRoom.tsx": {
+    "mtime": 1778128613.3009508,
+    "hash": "775479793fe7d8b05a98989e35b0ee3e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/hooks/useTranscription.ts": {
+    "mtime": 1778128995.3246155,
+    "hash": "eb4ef728dde0a9fceedc02df4f51a87b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/hooks/useInitialDrafts.ts": {
+    "mtime": 1778003078.3777516,
+    "hash": "2cbee7736552eba96a96f196ac3090a2"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/hooks/useMeetingSocket.ts": {
+    "mtime": 1778068083.8151548,
+    "hash": "10b20b33bb6e11a84a56314dda9f4dcc"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/hooks/useMediaStream.ts": {
+    "mtime": 1778003143.2403283,
+    "hash": "dc9ff2f9a306d3920786cae4e9e2211a"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/lib/clipboard.ts": {
+    "mtime": 1778087693.4744296,
+    "hash": "bf4ad920d68f945c6717981df21dc62a"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/lib/api.ts": {
+    "mtime": 1778126491.8326828,
+    "hash": "a1e22d9a9e66536319379fa75928304b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/lib/env.ts": {
+    "mtime": 1775097526.0,
+    "hash": "b63a2c19b7e04eb424dc9a289a309029"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/app/store/draftStore.ts": {
+    "mtime": 1778128598.66336,
+    "hash": "2553fbcdad5d2bec870b0afa9b9c3ba8"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/features/room/components/DynamicControls.tsx": {
+    "mtime": 1777900855.3892984,
+    "hash": "631a733d0916490935f96339d50642e4"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/features/room/components/FluidGrid.tsx": {
+    "mtime": 1778003632.9944305,
+    "hash": "25f24c13408d5b7816c663e59ca14f91"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/features/chat/components/Sidebar.tsx": {
+    "mtime": 1777900903.8356128,
+    "hash": "fd54094891ea908dc49d77221f3396df"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/stores/useRoomStore.ts": {
+    "mtime": 1777900808.359168,
+    "hash": "55c567c30fe7b126927f6aa3ae61cdfb"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/stores/useChatStore.ts": {
+    "mtime": 1777900797.6368563,
+    "hash": "cc5825ac12f76da755be32dd50f91157"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/stores/useUIStore.ts": {
+    "mtime": 1777900786.2288282,
+    "hash": "834db2bce6f324bd9aba61ba4b757e26"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/components/landing/Hero.tsx": {
+    "mtime": 1775245313.0,
+    "hash": "381476490e565143417d53ab7ffba45d"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/components/landing/CustomCursor.tsx": {
+    "mtime": 1775245174.0,
+    "hash": "2f585be7514140f63763ceacc7cc2d3e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/components/landing/Features.tsx": {
+    "mtime": 1775245226.0,
+    "hash": "a01a1e11b8e411cd9661ff971cc9c83c"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/components/landing/CallToAction.tsx": {
+    "mtime": 1775245320.0,
+    "hash": "cd19004fcb95db87e63bd24e44bf95a3"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/components/landing/SmoothScrollLayout.tsx": {
+    "mtime": 1775245184.0,
+    "hash": "6c68c8018f437e7d7371e5107ceb533a"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/components/landing/VideoPlaceholder.tsx": {
+    "mtime": 1775247586.0,
+    "hash": "fbf042d554a712724ce3b57997a1b26d"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/lib/supabase.ts": {
+    "mtime": 1778003223.4940596,
+    "hash": "ff63db8624544430f0d529b922775752"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/run.py": {
+    "mtime": 1774955601.0,
+    "hash": "e9231ef91aa37fbc77946fb6c783c60c"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/__init__.py": {
+    "mtime": 1774954620.0,
+    "hash": "ece21a118bb4a4e54c99edd7afb9a016"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/main.py": {
+    "mtime": 1778085703.167541,
+    "hash": "eeb655ccbd849c2303a283e0d5384526"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/auth.py": {
+    "mtime": 1778061344.4588525,
+    "hash": "35fe2ab66f3b6766c827326e1fefdedf"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/logging.py": {
+    "mtime": 1778065945.6211514,
+    "hash": "87aeeac398782d598907f9a78c853045"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/config.py": {
+    "mtime": 1778069401.6929386,
+    "hash": "3c47c49dafb2b369b23f04188cfd7b64"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/database.py": {
+    "mtime": 1778061491.438442,
+    "hash": "dccb47aecd233c1a854f85c278f68d4b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/constants.py": {
+    "mtime": 1778067862.2366455,
+    "hash": "093381c6a5c4e1a1471f4ac727b6856b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/__init__.py": {
+    "mtime": 1777890194.7743056,
+    "hash": "7c4b740e71914150f1dddaeb1559c48b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/event_bus.py": {
+    "mtime": 1778068255.8130841,
+    "hash": "2ba042adeafdf90e8083098545c1c47e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/exceptions.py": {
+    "mtime": 1777890295.092113,
+    "hash": "2d8f23c40232369c0cbd1eb2c02f2392"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/ids.py": {
+    "mtime": 1777890288.468059,
+    "hash": "88a8c55b0643b7a4416fd4fa5534df43"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/middleware.py": {
+    "mtime": 1778069413.7000604,
+    "hash": "53703512018615ce1c0de1c94b7f2e3e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/core/init_db.py": {
+    "mtime": 1778087914.8855214,
+    "hash": "cfce161c9092e27ccaf38bb5c49d5f7f"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/workers/queue.py": {
+    "mtime": 1778065966.2732487,
+    "hash": "f12f0385c9a0497ced530655ba01c66f"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/workers/run_intent_worker.py": {
+    "mtime": 1778062034.378415,
+    "hash": "8c1a6de719c0bbdeeb79add12a6b7e7c"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/workers/report_worker.py": {
+    "mtime": 1778087214.2581196,
+    "hash": "ab06c156094376961ab2f64ca6b06c1b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/workers/__init__.py": {
+    "mtime": 1777890221.0242298,
+    "hash": "444a937f2be2662e9685509b2849f46b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/workers/run_report_worker.py": {
+    "mtime": 1778062156.853491,
+    "hash": "21b71da77cde084aed8df0e5fb6aa6ca"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/workers/report_queue.py": {
+    "mtime": 1778065966.309904,
+    "hash": "0be940406bd7c9fe151aa50e5d5f94de"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/workers/intent_worker.py": {
+    "mtime": 1778087196.8623507,
+    "hash": "c4ec1d6a2c9542ca1a3066acc5560921"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/__init__.py": {
+    "mtime": 1777890202.8360665,
+    "hash": "39375a814003403ec71f252c2b860dd0"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/draft/models.py": {
+    "mtime": 1775107259.0,
+    "hash": "e0f2cf9657df116afcd42a7676989314"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/draft/handlers.py": {
+    "mtime": 1777890365.4735603,
+    "hash": "6af18614ca4bf59717a28b427c77c739"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/draft/__init__.py": {
+    "mtime": 1777890210.9090018,
+    "hash": "944584ff4ff34984e69d46c043308eca"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/draft/rules.py": {
+    "mtime": 1777889205.8837621,
+    "hash": "408202a47fc1df8bedf9b36574510ba9"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/intelligence/handlers.py": {
+    "mtime": 1778061721.285568,
+    "hash": "dcb279667a2a564a275e4920a5365c87"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/intelligence/__init__.py": {
+    "mtime": 1777890208.8861442,
+    "hash": "361167e89d76c88bbaeff738b6f71123"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/intelligence/intent_llm.py": {
+    "mtime": 1778087192.443361,
+    "hash": "0b515457a8f80aabc6a246d777add781"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/intelligence/summary_llm.py": {
+    "mtime": 1778087207.5856874,
+    "hash": "a27eb2e44f1e88f89371387ba84287f3"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/notification/handlers.py": {
+    "mtime": 1778068255.8848424,
+    "hash": "aa3d11411551ef82636c444e276bf070"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/notification/__init__.py": {
+    "mtime": 1777890216.9763224,
+    "hash": "3dec3484fe5544ef7b8c6d8b8fea61ca"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/transcript/service.py": {
+    "mtime": 1778002909.6831622,
+    "hash": "4639bcee2a8606bf56a6b3bb7f8a7223"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/transcript/deepgram.py": {
+    "mtime": 1778129074.9577396,
+    "hash": "4ee1fe13837767efa2daed1a2841a50d"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/transcript/handlers.py": {
+    "mtime": 1778068037.3655636,
+    "hash": "4c0146c7c1261c351880bca0892dc558"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/transcript/__init__.py": {
+    "mtime": 1777890206.8635638,
+    "hash": "b4460e3da8bc0017da70ce31c7361879"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/observability/__init__.py": {
+    "mtime": 1777890218.9992366,
+    "hash": "2b426edbc08714a5aad0e1c7cb6ba796"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/audit/__init__.py": {
+    "mtime": 1778061344.3543115,
+    "hash": "819694b675298b070e5b7fbb19fbec22"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/audit/repository.py": {
+    "mtime": 1778061344.3696556,
+    "hash": "e078cc574f76c1ab90692570b4a54570"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/meeting/service.py": {
+    "mtime": 1778061405.6222472,
+    "hash": "efaebc7e1865b6f17f89386ca18e6dfe"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/meeting/__init__.py": {
+    "mtime": 1777890204.84347,
+    "hash": "d13f822d798c3962840231ac8e226f10"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/meeting/export.py": {
+    "mtime": 1778061491.5208974,
+    "hash": "2a603c3d02cfd67eaa477421723d4fee"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/meeting/summary.py": {
+    "mtime": 1778129089.4411626,
+    "hash": "53880a662549d02e8af83ae23153978e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/meeting/permissions.py": {
+    "mtime": 1778061344.3995337,
+    "hash": "125ab2cee7b7b28732174efbf54312d0"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/meeting/repository.py": {
+    "mtime": 1778065997.9020684,
+    "hash": "8d98495fd101135c63c665b6786d2ba8"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/productivity/service.py": {
+    "mtime": 1778124838.7680204,
+    "hash": "a88c86107a7a53c346d21972b2041411"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/productivity/__init__.py": {
+    "mtime": 1778068016.8360748,
+    "hash": "7574b044bd4856a7d89d9d4a16f58ee7"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/approval/service.py": {
+    "mtime": 1778061395.488824,
+    "hash": "162c8980de37eedf72178e75d072adc0"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/approval/__init__.py": {
+    "mtime": 1777890212.9296944,
+    "hash": "9ec9bc5d1fee8969d23eeb2805828230"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/media/__init__.py": {
+    "mtime": 1777890214.952757,
+    "hash": "c36ddcade49db130490c6495cdc3e861"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/modules/media/livekit.py": {
+    "mtime": 1778002909.623004,
+    "hash": "dc9f765e8a8fbdeb1063d4263488cc81"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/gateway/__init__.py": {
+    "mtime": 1777890196.7805712,
+    "hash": "a0220c0e19b298c05ac9e9cbcf1b0496"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/gateway/http/health.py": {
+    "mtime": 1778062196.3219614,
+    "hash": "5e16814fa4221afdfed31b74b172d7b4"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/gateway/http/__init__.py": {
+    "mtime": 1777890198.8125715,
+    "hash": "2a89349d01ebff952d404bdc3195a98e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/gateway/http/router.py": {
+    "mtime": 1778068037.3112097,
+    "hash": "3ee1b421d26e28202e954503c7d7ac41"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/gateway/ws/__init__.py": {
+    "mtime": 1777890200.821817,
+    "hash": "2b43b1ff4808e9d7fc1dbb3ff97db731"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/app/gateway/ws/manager.py": {
+    "mtime": 1778002909.5923858,
+    "hash": "e46e2afb12ea26a4e4e96a583801f0c0"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_intent_queue.py": {
+    "mtime": 1778066127.5884159,
+    "hash": "e8dbfa035f303baa7d7b47bd3696f9a0"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_redis_intent_queue.py": {
+    "mtime": 1778066106.2481387,
+    "hash": "8d66eace443d3394cc5f614c6faa888e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/__init__.py": {
+    "mtime": 1774954620.0,
+    "hash": "c75939550ae9512267ae10f0d19a215e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_intent.py": {
+    "mtime": 1778003735.146957,
+    "hash": "d6f212ade02332a503a589238f0774f1"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_ws_auth.py": {
+    "mtime": 1778003764.540612,
+    "hash": "3d1e1ce08dbf270ca7260f539885e3c8"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_request_guards.py": {
+    "mtime": 1778066537.6990378,
+    "hash": "e50563aacae2f1cef59f07b4c0f33cbf"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_report_status.py": {
+    "mtime": 1778066140.501735,
+    "hash": "4924d10067d29afa5cb86d1656b69157"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_auth_boundaries.py": {
+    "mtime": 1778003735.205828,
+    "hash": "e8417b536b9bd643ea7001d45bd1e056"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_health.py": {
+    "mtime": 1774955637.0,
+    "hash": "d7925dff884195a04d380a461b3d278b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_productivity_features.py": {
+    "mtime": 1778129122.8180192,
+    "hash": "2c3da187785a7465732e9911e490920b"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/tests/test_security_hardening.py": {
+    "mtime": 1778066162.6967056,
+    "hash": "8bb4fa7973b0d157e0066d826fc479a9"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/scratch/test_backend.js": {
+    "mtime": 1778069346.1721232,
+    "hash": "751344dc1d209e07f43347681f26be1f"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/scripts/apply_indexes.py": {
+    "mtime": 1775097385.0,
+    "hash": "96192086390941ea5e47e644966ebeb8"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/AGENT_RULES.md": {
+    "mtime": 1778142286.748991,
+    "hash": "8f7cbd22f8c0a9933beb9f3fff43dd22"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/prompt.md": {
+    "mtime": 1777888390.1914723,
+    "hash": "8b98161c9fce7907a82eff79cbfd6487"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/INSTALL.md": {
+    "mtime": 1775119714.0,
+    "hash": "a9e9894d8e4fe68ecf8a54d73d05fab9"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/README.md": {
+    "mtime": 1778142305.0250816,
+    "hash": "5638391517613aba9204f10ed9483081"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/APItest.html": {
+    "mtime": 1777906897.9647958,
+    "hash": "1564d1117a6a777428decd44246f0145"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/DEPLOYMENT.md": {
+    "mtime": 1775241771.0,
+    "hash": "74eb4d1dbdab9c3de98b070cf99fca76"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/GEMINI.md": {
+    "mtime": 1778142228.8393557,
+    "hash": "8ee39dcfe68a23b3797b02648930d699"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/README.md": {
+    "mtime": 1774954494.0,
+    "hash": "1687e9644651956395451500ea629e95"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/features/README.md": {
+    "mtime": 1777900819.1506135,
+    "hash": "bbe29285731e4bcde91c09e4a7c63579"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/scripts/demo-script.md": {
+    "mtime": 1775010280.0,
+    "hash": "e89480174fed30bf0837f0c0f2a3c5c4"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/doc's/fire_hox_connect_tech_stack.md": {
+    "mtime": 1774954034.0,
+    "hash": "f8c1328b9dff2d72f28497a9a9329d38"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/doc's/fire_hox_connect_ai_coding_prompts.md": {
+    "mtime": 1774954074.0,
+    "hash": "7f4adeeaa439146f51ab30a8fbddf61a"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/doc's/fire_hox_connect_implementation_plan.md": {
+    "mtime": 1774954064.0,
+    "hash": "3e0f265010d1e3f8d4879195742f65cd"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/doc's/fire_hox_connect_frontend_guidelines.md": {
+    "mtime": 1774954044.0,
+    "hash": "a6b256201d5ed64ad5340eb1542c608e"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/doc's/fire_hox_connect_app_flow.md": {
+    "mtime": 1774954021.0,
+    "hash": "104562ae9996b22e0d32d87db5796028"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/doc's/fire_hox_connect_prd.md": {
+    "mtime": 1774953843.0,
+    "hash": "c8fe47d295278b5970802b9336333106"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/doc's/fire_hox_connect_backend_schema.md": {
+    "mtime": 1774954056.0,
+    "hash": "a45c4c7fc48449b5b47c7aa55238f193"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/constraints.txt": {
+    "mtime": 1778066167.2750247,
+    "hash": "9c5ddfc3c2e5e496e5109ef2bad29070"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/requirements.txt": {
+    "mtime": 1778065386.9219058,
+    "hash": "946c1daa8a13ecd0584654eb0d5ffc2f"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/README.md": {
+    "mtime": 1778066171.8349895,
+    "hash": "1bfca768c36ab81366fe1361409bdc89"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/backend/requirements-dev.txt": {
+    "mtime": 1778065508.6768353,
+    "hash": "62bce5db6ec8cd529c891ab2263789f3"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/public/vercel.svg": {
+    "mtime": 1774954494.0,
+    "hash": "61c6b19abff40ea7acd577be818f3976"
+  },
+  "/Users/abrarakhunji/Desktop/FH-Connect/FH-Connect/frontend/public/next.svg": {
+    "mtime": 1774954494.0,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  }
+}

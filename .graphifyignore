@@ -1,0 +1,19 @@
+node_modules/
+dist/
+vendor/
+*.generated.py
+.venv/
+backend/.venv/
+.next/
+frontend/.next/
+out/
+build/
+*.mp4
+*.mov
+*.avi
+connect demo.mp4
+backend/__pycache__/
+frontend/node_modules/
+tmp/
+.git/
+graphify-out/

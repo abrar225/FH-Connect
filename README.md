@@ -54,6 +54,14 @@ For deep-dives into the architecture, design, and implementation:
 - [**App User Flow**](./doc%27s/fire_hox_connect_app_flow.md)
 - [**Frontend Guidelines**](./doc%27s/fire_hox_connect_frontend_guidelines.md)
 
+## 🤖 AI & Agent Rules
+
+This repository is optimized for AI coding assistants using **Graphify**. 
+
+- **Knowledge Graph**: A pre-built graph is available in `graphify-out/`.
+- **Mandatory Procedure**: All AI agents MUST run `backend/.venv/bin/graphify update .` after any code changes.
+- **Rules**: See [**AGENT_RULES.md**](./AGENT_RULES.md) for full instructions.
+
 ---
 
 Developed with ❤️ by the FireHox Team.
