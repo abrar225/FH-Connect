@@ -12,7 +12,7 @@ from email.message import EmailMessage
 from typing import Any, Dict, List, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from cryptography.fernet import Fernet
 
 from app.core.auth import AuthUser, get_current_user, require_meeting_admin
@@ -73,6 +73,16 @@ class EmailReportRequest(BaseModel):
     recipients: List[str] = Field(min_length=1, max_length=25)
     message: Optional[str] = Field(default=None, max_length=1000)
 
+    @field_validator("recipients", mode="before")
+    @classmethod
+    def validate_email_format(cls, v: List[str]) -> List[str]:
+        import re
+        email_re = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+        for addr in v:
+            if not isinstance(addr, str) or not email_re.fullmatch(addr.strip()):
+                raise ValueError(f"Invalid email address: {addr}")
+        return [addr.strip() for addr in v]
+
 
 class SettingsPayload(BaseModel):
     profile: Dict[str, Any] = Field(default_factory=dict)
@@ -100,8 +110,7 @@ class IntegrationPayload(BaseModel):
     secret_ref: Optional[str] = None
 
 
-def _json(value: Any) -> str:
-    return json.dumps(value if value is not None else [])
+
 
 
 def _as_dict(value: Any) -> dict:
@@ -133,8 +142,11 @@ def _ai_secret_cipher() -> Fernet:
         or settings.SUPABASE_SERVICE_ROLE_KEY
         or settings.GEMINI_API_KEY
         or settings.GROQ_API_KEY
-        or "firehox-connect-local-development-secret"
     )
+    if not seed:
+        if settings.ENVIRONMENT == "production":
+            raise RuntimeError("Missing AI_KEY_ENCRYPTION_SECRET or equivalent in production")
+        seed = "firehox-connect-local-development-secret"
     digest = hashlib.sha256(seed.encode()).digest()
     return Fernet(base64.urlsafe_b64encode(digest))
 
@@ -183,9 +195,9 @@ async def get_user_ai_runtime_config(user_id: str) -> Optional[dict]:
         return None
     try:
         api_key = _ai_secret_cipher().decrypt(key_row["encrypted_api_key"].encode()).decode()
-    except Exception:
-        logger.warning("Stored AI provider key could not be decrypted", extra={"user_id": user_id, "provider": provider})
-        return None
+    except Exception as exc:
+        logger.error("Stored AI provider key could not be decrypted", extra={"user_id": user_id, "provider": provider}, exc_info=exc)
+        raise HTTPException(status_code=500, detail="Internal configuration error: Failed to decrypt AI provider key")
     return {
         "provider": provider,
         "model": str(ai_preferences.get("custom_model") or ai_preferences.get("model") or "").strip(),
@@ -388,7 +400,7 @@ async def compute_quality_score(room_id: str) -> dict:
         decisions,
         assigned,
         unresolved_questions,
-        json.dumps(participation_pct),
+        participation_pct,
     )
     await bus.emit(Event(
         event_type=EventTypes.QUALITY_SCORE_UPDATED,
@@ -400,14 +412,20 @@ async def compute_quality_score(room_id: str) -> dict:
 
 
 @router.get("/meetings")
-async def list_meetings(current_user: AuthUser = Depends(get_current_user)):
+async def list_meetings(
+    limit: int = 50,
+    offset: int = 0,
+    current_user: AuthUser = Depends(get_current_user),
+):
     await _ensure_personal_workspace(current_user)
+    limit = min(limit, 100)
     rows = await db.pool.fetch(
         """SELECT *, report_content IS NOT NULL AS has_report
            FROM meetings
            WHERE created_by = $1 OR $1 = ANY(admins)
-           ORDER BY COALESCE(scheduled_for, started_at, created_at) DESC""",
-        current_user.id,
+           ORDER BY COALESCE(scheduled_for, started_at, created_at) DESC
+           LIMIT $2 OFFSET $3""",
+        current_user.id, limit, offset,
     )
     return [{**dict(row), "status": _room_status(dict(row))} for row in rows]
 
@@ -449,11 +467,11 @@ async def upsert_agenda(room_id: str, req: AgendaPayload, current_user: AuthUser
              updated_at = timezone('utc'::text, now())
            RETURNING *""",
         room_id,
-        _json(req.goals),
-        _json(req.agenda_items),
-        _json(req.expected_decisions),
-        _json(req.attendees),
-        _json(req.prep_docs),
+        req.goals if req.goals is not None else [],
+        req.agenda_items if req.agenda_items is not None else [],
+        req.expected_decisions if req.expected_decisions is not None else [],
+        req.attendees if req.attendees is not None else [],
+        req.prep_docs if req.prep_docs is not None else [],
         current_user.id,
     )
     await bus.emit(Event(
@@ -520,15 +538,22 @@ async def patch_action(insight_id: str, req: InsightPatch, current_user: AuthUse
 
 
 @router.get("/actions")
-async def list_actions(current_user: AuthUser = Depends(get_current_user)):
+async def list_actions(
+    limit: int = 50,
+    offset: int = 0,
+    current_user: AuthUser = Depends(get_current_user)
+):
     await require_database()
+    limit = min(limit, 100)
+    
     rows = await db.pool.fetch(
         """SELECT mi.*, m.title AS meeting_title
            FROM meeting_insights mi
            JOIN meetings m ON m.room_id = mi.room_id
            WHERE mi.type = 'action_item' AND (m.created_by = $1 OR $1 = ANY(m.admins) OR mi.owner = $1)
-           ORDER BY mi.created_at DESC""",
-        current_user.id,
+           ORDER BY mi.created_at DESC
+           LIMIT $2 OFFSET $3""",
+        current_user.id, limit, offset
     )
     drafts = await db.pool.fetch(
         """SELECT td.id, td.room_id, 'draft' AS type, td.title, td.original_transcript AS detail,
@@ -536,8 +561,9 @@ async def list_actions(current_user: AuthUser = Depends(get_current_user)):
            FROM task_drafts td
            JOIN meetings m ON m.room_id = td.room_id
            WHERE m.created_by = $1 OR $1 = ANY(m.admins) OR td.assignee = $1
-           ORDER BY td.created_at DESC""",
-        current_user.id,
+           ORDER BY td.created_at DESC
+           LIMIT $2 OFFSET $3""",
+        current_user.id, limit, offset
     )
     return [dict(row) for row in rows] + [dict(row) for row in drafts]
 
@@ -576,8 +602,13 @@ async def ask_copilot(room_id: str, req: CopilotRequest, current_user: AuthUser 
 
 
 @router.get("/recordings")
-async def list_recordings(current_user: AuthUser = Depends(get_current_user)):
+async def list_recordings(
+    limit: int = 50,
+    offset: int = 0,
+    current_user: AuthUser = Depends(get_current_user),
+):
     await require_database()
+    limit = min(limit, 100)
     rows = await db.pool.fetch(
         """SELECT m.room_id, m.title, m.started_at, m.ended_at, COUNT(mt.id) AS transcript_count,
                   m.report_content IS NOT NULL AS has_report
@@ -586,8 +617,9 @@ async def list_recordings(current_user: AuthUser = Depends(get_current_user)):
            WHERE m.created_by = $1 OR $1 = ANY(m.admins)
            GROUP BY m.room_id, m.title, m.started_at, m.ended_at, m.report_content
            HAVING COUNT(mt.id) > 0
-           ORDER BY COALESCE(m.ended_at, m.started_at, m.created_at) DESC""",
-        current_user.id,
+           ORDER BY COALESCE(m.ended_at, m.started_at, m.created_at) DESC
+           LIMIT $2 OFFSET $3""",
+        current_user.id, limit, offset,
     )
     return [dict(row) for row in rows]
 
@@ -607,16 +639,22 @@ async def recording_transcript(room_id: str, q: str = "", current_user: AuthUser
 
 
 @router.get("/reports")
-async def list_reports(current_user: AuthUser = Depends(get_current_user)):
+async def list_reports(
+    limit: int = 50,
+    offset: int = 0,
+    current_user: AuthUser = Depends(get_current_user),
+):
     await require_database()
+    limit = min(limit, 100)
     rows = await db.pool.fetch(
         """SELECT m.*, qs.score AS quality_score
            FROM meetings m
            LEFT JOIN meeting_quality_scores qs ON qs.room_id = m.room_id
            WHERE (m.created_by = $1 OR $1 = ANY(m.admins))
              AND (m.report_requested_at IS NOT NULL OR m.report_content IS NOT NULL OR m.report_status = 'failed')
-           ORDER BY COALESCE(m.ended_at, m.report_requested_at, m.created_at) DESC""",
-        current_user.id,
+           ORDER BY COALESCE(m.ended_at, m.report_requested_at, m.created_at) DESC
+           LIMIT $2 OFFSET $3""",
+        current_user.id, limit, offset,
     )
     return [dict(row) for row in rows]
 
@@ -684,11 +722,22 @@ async def email_report(room_id: str, req: EmailReportRequest, current_user: Auth
     meeting = await _fetch_report(room_id)
     markdown = _report_to_markdown(meeting)
     import os
+    import httpx
+    import aiosmtplib
     webhook = os.getenv("EMAIL_WEBHOOK_URL")
     if webhook:
-        data = json.dumps({"room_id": room_id, "recipients": req.recipients, "message": req.message, "report": markdown}).encode()
-        request = urllib.request.Request(webhook, data=data, headers={"Content-Type": "application/json"}, method="POST")
-        await __import__("asyncio").to_thread(urllib.request.urlopen, request, 10)
+        # SSRF protection: reject internal/private URLs
+        from urllib.parse import urlparse
+        parsed = urlparse(webhook)
+        if parsed.scheme not in ("https",):
+            raise HTTPException(status_code=500, detail="Email webhook must use HTTPS")
+        hostname = parsed.hostname or ""
+        if hostname in ("localhost", "127.0.0.1", "0.0.0.0", "::1") or hostname.startswith("10.") or hostname.startswith("192.168.") or hostname.startswith("169.254.") or hostname.startswith("172."):
+            raise HTTPException(status_code=500, detail="Email webhook cannot target internal addresses")
+        logger.info(f"Sending report via webhook [room={room_id}, recipients={len(req.recipients)}]")
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            res = await client.post(webhook, json={"room_id": room_id, "recipients": req.recipients, "message": req.message, "report": markdown})
+            res.raise_for_status()
         return {"status": "sent", "provider": "webhook"}
     smtp_host = os.getenv("SMTP_HOST")
     if smtp_host:
@@ -697,8 +746,7 @@ async def email_report(room_id: str, req: EmailReportRequest, current_user: Auth
         message["From"] = os.getenv("SMTP_FROM", "reports@firehox.local")
         message["To"] = ", ".join(req.recipients)
         message.set_content((req.message + "\n\n" if req.message else "") + markdown)
-        with smtplib.SMTP(smtp_host, int(os.getenv("SMTP_PORT", "25"))) as smtp:
-            smtp.send_message(message)
+        await aiosmtplib.send(message, hostname=smtp_host, port=int(os.getenv("SMTP_PORT", "25")))
         return {"status": "sent", "provider": "smtp"}
     return {"status": "configured_required", "provider": "none"}
 
@@ -717,11 +765,11 @@ async def get_settings(current_user: AuthUser = Depends(get_current_user)):
            VALUES ($1, $2::jsonb, $3::jsonb, $4, $5::jsonb, $6::jsonb, $7)
            RETURNING *""",
         current_user.id,
-        json.dumps(defaults.profile),
-        json.dumps(defaults.notification_preferences),
+        defaults.profile,
+        defaults.notification_preferences,
         defaults.default_report_format,
-        json.dumps(defaults.ai_preferences),
-        json.dumps(defaults.security_preferences),
+        defaults.ai_preferences,
+        defaults.security_preferences,
         defaults.data_retention_days,
     )
     data = dict(created)
@@ -753,11 +801,11 @@ async def update_settings(req: SettingsPayload, current_user: AuthUser = Depends
                  updated_at = timezone('utc'::text, now())
                RETURNING *""",
             current_user.id,
-            json.dumps(req.profile),
-            json.dumps(req.notification_preferences),
+            req.profile,
+            req.notification_preferences,
             req.default_report_format,
-            json.dumps(ai_preferences),
-            json.dumps(req.security_preferences),
+            ai_preferences,
+            req.security_preferences,
             req.data_retention_days,
         )
     except Exception as exc:
@@ -797,10 +845,47 @@ async def upsert_integration(req: IntegrationPayload, current_user: AuthUser = D
         current_user.id,
         provider,
         req.status,
-        json.dumps(req.config),
+        req.config,
         req.secret_ref,
     )
     return dict(row)
+
+@router.get("/integrations/dead-letters")
+async def get_dead_letters(current_user: AuthUser = Depends(get_current_user)):
+    await require_database()
+    workspace = await _ensure_personal_workspace(current_user)
+    rows = await db.pool.fetch(
+        """SELECT id, provider, action, payload, status, last_error, updated_at 
+           FROM connector_jobs 
+           WHERE workspace_id = $1 AND status = 'dead_lettered'
+           ORDER BY updated_at DESC""",
+        workspace["id"]
+    )
+    return {"dead_letters": [dict(r) for r in rows]}
+
+
+@router.post("/integrations/{job_id}/retry")
+async def retry_dead_letter(job_id: str, current_user: AuthUser = Depends(get_current_user)):
+    await require_database()
+    workspace = await _ensure_personal_workspace(current_user)
+    row = await db.pool.fetchrow(
+        "SELECT id FROM connector_jobs WHERE id = $1 AND workspace_id = $2 AND status = 'dead_lettered'",
+        job_id, workspace["id"]
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Dead letter job not found")
+        
+    from datetime import datetime, timezone
+    await db.pool.execute(
+        "UPDATE connector_jobs SET status = 'queued', attempts = 0, next_run_at = timezone('utc'::text, now()), updated_at = timezone('utc'::text, now()) WHERE id = $1",
+        job_id
+    )
+    
+    from app.workers.connector_queue import schedule_connector_job
+    await schedule_connector_job(job_id, datetime.now(timezone.utc))
+    
+    return {"status": "success", "message": "Job queued for retry"}
+
 
 
 @router.post("/integrations/{provider}/test")
@@ -812,8 +897,45 @@ async def test_integration(provider: str, current_user: AuthUser = Depends(get_c
     config = row["config"] or {}
     webhook = config.get("webhook_url")
     if webhook:
-        data = json.dumps({"text": "FireHox Connect integration test"}).encode()
-        request = urllib.request.Request(webhook, data=data, headers={"Content-Type": "application/json"}, method="POST")
-        await __import__("asyncio").to_thread(urllib.request.urlopen, request, 10)
+        import httpx
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            res = await client.post(webhook, json={"text": "FireHox Connect integration test"})
+            res.raise_for_status()
         return {"status": "ok", "provider": provider}
     return {"status": "configured", "provider": provider, "external_call": "skipped"}
+
+
+@router.delete("/meeting/{room_id}")
+async def delete_meeting(room_id: str, current_user: AuthUser = Depends(get_current_user)):
+    await require_meeting_admin(room_id, current_user)
+    await db.pool.execute("DELETE FROM meetings WHERE room_id = $1", room_id)
+    return {"status": "deleted", "room_id": room_id}
+
+
+@router.delete("/actions/{insight_id}")
+async def delete_action(insight_id: str, current_user: AuthUser = Depends(get_current_user)):
+    await require_database()
+    row = await db.pool.fetchrow("SELECT room_id FROM meeting_insights WHERE id = $1", insight_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Action not found")
+    await require_meeting_admin(row["room_id"], current_user)
+    await db.pool.execute("DELETE FROM meeting_insights WHERE id = $1", insight_id)
+    return {"status": "deleted", "id": insight_id}
+
+
+@router.delete("/recordings/{room_id}")
+async def delete_recording(room_id: str, current_user: AuthUser = Depends(get_current_user)):
+    await require_meeting_admin(room_id, current_user)
+    await db.pool.execute("DELETE FROM meeting_transcripts WHERE room_id = $1", room_id)
+    await db.pool.execute("DELETE FROM meetings WHERE room_id = $1", room_id)
+    return {"status": "deleted", "room_id": room_id}
+
+
+@router.delete("/reports/{room_id}")
+async def delete_report(room_id: str, current_user: AuthUser = Depends(get_current_user)):
+    await require_meeting_admin(room_id, current_user)
+    await db.pool.execute(
+        "UPDATE meetings SET report_content = NULL, report_status = NULL, report_requested_at = NULL, report_error = NULL WHERE room_id = $1",
+        room_id,
+    )
+    return {"status": "deleted", "room_id": room_id}

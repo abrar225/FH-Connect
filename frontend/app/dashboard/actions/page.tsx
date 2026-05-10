@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clock, ExternalLink, Search } from "lucide-react";
+import { CheckCircle2, Clock, ExternalLink, Search, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { authFetch } from "@/app/lib/api";
 
@@ -50,6 +50,12 @@ export default function ActionsPage() {
     if (res.ok) loadActions();
   };
 
+  const deleteAction = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this action? This action cannot be undone.")) return;
+    const res = await authFetch(`/api/actions/${id}`, { method: "DELETE" });
+    if (res.ok) loadActions();
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto h-full">
       <div className="mb-8">
@@ -94,6 +100,9 @@ export default function ActionsPage() {
                 <button onClick={() => router.push(`/room/${action.room_id}`)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-gray-300">
                   <ExternalLink className="h-3.5 w-3.5" />
                   Meeting
+                </button>
+                <button onClick={() => deleteAction(action.id)} className="inline-flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/20">
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>

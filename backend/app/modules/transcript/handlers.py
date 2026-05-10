@@ -13,6 +13,7 @@ This handler performs:
 from app.core.event_bus import bus, Event
 from app.core.constants import EventTypes
 from app.core.logging import get_logger
+from app.modules.intelligence.intent_preprocessor import detect_deterministic_intent
 
 logger = get_logger("transcript.handler")
 
@@ -53,7 +54,25 @@ async def handle_transcript_received(event: Event):
         )
         admins = meeting_record["admins"] if meeting_record and meeting_record["admins"] else []
         if admins and user_id not in admins:
-            logger.debug(f"Transcript accepted from non-admin participant [trace={event.trace_id[:8]}]")
+            suggestion = detect_deterministic_intent(text, speaker, active_users=active_users)
+            if suggestion and payload.get("is_final", True):
+                await bus.emit(Event(
+                    event_type=EventTypes.INTENT_CLARIFICATION_REQUIRED,
+                    trace_id=event.trace_id,
+                    meeting_id=room_id,
+                    payload={
+                        "room_id": room_id,
+                        "text": text,
+                        "speaker": speaker,
+                        "user_id": user_id,
+                        "proposed_action": suggestion.intent.action,
+                        "proposed_payload": suggestion.intent.model_dump(),
+                        "confidence": min(suggestion.intent.confidence, 0.84),
+                        "status": "participant_suggestion",
+                    },
+                ))
+            logger.debug(f"Transcript accepted from non-admin participant without executable task intent [trace={event.trace_id[:8]}]")
+            return
 
     # ── Step 3: Fetch active drafts for context ───────────────────────────
     active_drafts = []

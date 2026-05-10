@@ -13,13 +13,13 @@ async def _request(method: str, url: str, **kwargs):
 
 def test_livekit_token_requires_authentication():
     response = asyncio.run(
-        _request("GET", "/api/livekit/token?room_name=abc-def-ghi&participant_name=Test")
+        _request("GET", "/v1/api/livekit/token?room_name=abc-def-ghi&participant_name=Test")
     )
 
     assert response.status_code == 401
 
 
-def test_transcript_ingest_requires_authentication():
+def test_legacy_transcript_ingest_route_is_removed():
     response = asyncio.run(
         _request(
             "POST",
@@ -33,16 +33,16 @@ def test_transcript_ingest_requires_authentication():
         )
     )
 
-    assert response.status_code == 401
+    assert response.status_code == 404
 
 
-def test_deepgram_token_requires_authentication():
+def test_legacy_deepgram_token_route_is_removed():
     response = asyncio.run(_request("GET", "/api/deepgram/token"))
 
-    assert response.status_code == 401
+    assert response.status_code == 404
 
 
 def test_approval_list_requires_authentication():
-    response = asyncio.run(_request("GET", "/api/approval?room_id=abc-def-ghi"))
+    response = asyncio.run(_request("GET", "/v1/api/approval?room_id=abc-def-ghi"))
 
     assert response.status_code == 401

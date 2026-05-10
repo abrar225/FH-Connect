@@ -18,6 +18,7 @@ class EventTypes:
     INTENT_REQUESTED = "intent.requested"
     INTENT_DETECTED = "intent.detected"
     INTENT_REJECTED = "intent.rejected"
+    INTENT_CLARIFICATION_REQUIRED = "intent.clarification_required"
 
     # ── Draft Domain ──────────────────────────────────────────────────────
     DRAFT_CREATED = "draft.created"
@@ -49,3 +50,7 @@ class EventTypes:
 
     # ── Pulse / Summary ───────────────────────────────────────────────────
     PULSE_GENERATED = "pulse.generated"
+
+    # ── Chat ──────────────────────────────────────────────────────────────
+    CHAT_BROADCAST = "chat.broadcast"
+

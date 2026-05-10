@@ -183,7 +183,7 @@ export default function DraftCard({ draft, isAdmin = false, activeUsers = [], in
             className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-white/5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-colors text-xs font-bold uppercase tracking-wider"
           >
             <X className="w-3.5 h-3.5" />
-            <span>Discard</span>
+            <span>Reject</span>
           </button>
           <button
             onClick={handleApprove}
@@ -195,7 +195,7 @@ export default function DraftCard({ draft, isAdmin = false, activeUsers = [], in
             }`}
           >
             <Check className="w-4 h-4" />
-            <span>Approve Task</span>
+            <span>Approve</span>
           </button>
         </div>
       )}

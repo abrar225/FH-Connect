@@ -19,7 +19,9 @@ async def process_intent_task(event: Event):
     This was moved from intelligence.handlers to run off the critical path.
     """
     from app.modules.intelligence.intent_llm import detect_intent
+    from app.modules.intelligence.intent_preprocessor import detect_deterministic_intent
     from app.modules.draft.rules import process_intent
+    from app.core.config import settings
 
     payload = event.payload
     text = payload["text"]
@@ -29,30 +31,49 @@ async def process_intent_task(event: Event):
     active_users = payload.get("active_users", [])
     active_drafts = payload.get("active_drafts", [])
 
-    MAX_RETRIES = 2
-    for attempt in range(MAX_RETRIES):
-        try:
-            # Step 1: LLM intent detection (This takes time, hence the background worker)
-            intent_result = await detect_intent(text, speaker, active_drafts, active_users, user_id=user_id)
+    deterministic = detect_deterministic_intent(text, speaker, active_drafts, active_users)
+    if deterministic and deterministic.intent.confidence >= 0.85:
+        intent_result = deterministic.intent
+        action, data = process_intent(intent_result, text, room_id)
+    else:
+        MAX_RETRIES = 2
+        for attempt in range(MAX_RETRIES):
+            try:
+                intent_result = await detect_intent(text, speaker, active_drafts, active_users, user_id=user_id)
+                action, data = process_intent(intent_result, text, room_id)
+                break
+            except Exception as e:
+                if attempt == MAX_RETRIES - 1:
+                    logger.error(
+                        f"Intent detection failed after {MAX_RETRIES} attempts: {e} "
+                        f"[trace={event.trace_id[:8]}, room={room_id}]"
+                    )
+                    await bus.emit(Event(
+                        event_type=EventTypes.INTENT_REJECTED,
+                        trace_id=event.trace_id,
+                        meeting_id=room_id,
+                        payload={"reason": "llm_error", "error": str(e), "text": text},
+                    ))
+                    return
+                logger.warning(f"Intent detection retry {attempt + 1}/{MAX_RETRIES} for [trace={event.trace_id[:8]}]")
+                await asyncio.sleep(1)
 
-            # Step 2: Rules engine
-            action, data = process_intent(intent_result, text, room_id)
-            break
-        except Exception as e:
-            if attempt == MAX_RETRIES - 1:
-                logger.error(
-                    f"Intent detection failed after {MAX_RETRIES} attempts: {e} "
-                    f"[trace={event.trace_id[:8]}, room={room_id}]"
-                )
-                await bus.emit(Event(
-                    event_type=EventTypes.INTENT_REJECTED,
-                    trace_id=event.trace_id,
-                    meeting_id=room_id,
-                    payload={"reason": "llm_error", "error": str(e), "text": text},
-                ))
-                return
-            logger.warning(f"Intent detection retry {attempt + 1}/{MAX_RETRIES} for [trace={event.trace_id[:8]}]")
-            await asyncio.sleep(1) # simple backoff
+    if "intent_result" in locals() and 0.60 <= intent_result.confidence < settings.INTENT_CONFIDENCE_THRESHOLD:
+        await bus.emit(Event(
+            event_type=EventTypes.INTENT_CLARIFICATION_REQUIRED,
+            trace_id=event.trace_id,
+            meeting_id=room_id,
+            payload={
+                "room_id": room_id,
+                "text": text,
+                "speaker": speaker,
+                "user_id": user_id,
+                "proposed_action": intent_result.action,
+                "proposed_payload": intent_result.model_dump(),
+                "confidence": intent_result.confidence,
+            },
+        ))
+        return
 
     if not action:
         logger.debug(

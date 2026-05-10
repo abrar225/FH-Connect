@@ -5,8 +5,8 @@ from app.core.constants import EventTypes
 from app.core.event_bus import Event, bus
 from app.core.ids import new_trace_id
 from app.modules.audit.repository import record_audit_event
-from app.modules.draft.models import TaskDraft
-from app.modules.intelligence.summary_llm import TranscriptionLine, generate_final_report
+from app.modules.intelligence.summary_llm import generate_final_report
+from app.modules.meeting.report_repository import load_report_inputs
 from app.modules.meeting.repository import save_meeting_report, set_report_status
 from app.workers.report_queue import (
     ack_report_event,
@@ -23,9 +23,6 @@ async def process_report_task(event):
     payload = event.payload
     room_id = payload["room_id"]
     actor_id = payload.get("actor_id")
-    transcripts = [TranscriptionLine.model_validate(item) for item in payload.get("transcripts", [])]
-    approved_tasks = [TaskDraft.model_validate(item) for item in payload.get("approved_tasks", [])]
-
     await set_report_status(room_id, "processing")
     await bus.emit(Event(
         event_type=EventTypes.REPORT_STATUS_UPDATED,
@@ -33,6 +30,7 @@ async def process_report_task(event):
         meeting_id=room_id,
         payload={"room_id": room_id, "status": "processing", "error": None},
     ))
+    transcripts, approved_tasks = await load_report_inputs(room_id)
     report = await generate_final_report(transcripts, approved_tasks, user_id=actor_id)
     await save_meeting_report(room_id, report.model_dump_json())
     await bus.emit(Event(

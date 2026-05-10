@@ -1,7 +1,7 @@
 from pydantic import ValidationError
 
 from app.modules.draft.rules import process_intent
-from app.modules.intelligence.intent_llm import TaskIntent
+from app.modules.intelligence.intent_llm import TaskIntent, _resolve_assignee_name
 
 
 def test_task_intent_rejects_unknown_action():
@@ -35,3 +35,11 @@ def test_create_intent_produces_room_scoped_draft():
     assert payload.room_id == "room-a"
     assert payload.title == "Prepare launch checklist"
     assert payload.assignee == "Asha"
+
+
+def test_assignee_resolution_supports_all_participants():
+    assert _resolve_assignee_name("everyone", "Asha", ["Asha", "Rahul"]) == "All participants"
+
+
+def test_assignee_resolution_maps_partial_names():
+    assert _resolve_assignee_name("Abrar", "Asha", ["Abrar AKhunji", "Bros Over Memes"]) == "Abrar AKhunji"

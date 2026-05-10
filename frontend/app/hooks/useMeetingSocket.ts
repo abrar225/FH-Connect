@@ -22,6 +22,8 @@ export function useMeetingSocket(roomId: string, userId: string = "") {
   const updateInsight = useDraftStore((state) => state.updateInsight);
   const addChatMessage = useDraftStore((state) => state.addChatMessage);
   const incrementUnreadChat = useDraftStore((state) => state.incrementUnreadChat);
+  const addClarification = useDraftStore((state) => state.addClarification);
+  const removeClarification = useDraftStore((state) => state.removeClarification);
   const addDraftStoreTranscription = useDraftStore((state) => state.addTranscription);
   const updateDraftStoreTranscription = useDraftStore((state) => state.updateTranscription);
 
@@ -43,6 +45,11 @@ export function useMeetingSocket(roomId: string, userId: string = "") {
       ws.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        const eventRoomId = data.room_id || data.payload?.room_id || data.agenda?.room_id || data.insight?.room_id;
+        const activeRoomId = useDraftStore.getState().activeRoomId;
+        if (eventRoomId && activeRoomId && eventRoomId !== activeRoomId) {
+          return;
+        }
         // --- Handle Meeting Pulse broadcasts (Phase 2) ---
         if (data.type === "pulse") {
           setPulse({
@@ -88,6 +95,34 @@ export function useMeetingSocket(roomId: string, userId: string = "") {
           return;
         }
 
+        if (data.type === "report_status") {
+          useDraftStore.getState().setReportStatus({
+            status: data.status,
+            has_report: data.status === "completed",
+            report_error: data.error,
+          });
+          return;
+        }
+
+        if (data.type === "intent_clarification_required") {
+          addClarification({
+            id: data.event_id || data.id || `clarification-${data.room_id || roomId}-${data.trace_id || Date.now()}`,
+            room_id: data.room_id || roomId,
+            text: data.text || "",
+            speaker: data.speaker || null,
+            proposed_action: data.proposed_action || null,
+            proposed_payload: data.proposed_payload || null,
+            confidence: data.confidence ?? null,
+            status: data.status || "pending",
+          });
+          return;
+        }
+
+        if (data.type === "clarification_status") {
+          if (data.id) removeClarification(data.id);
+          return;
+        }
+
         // --- Handle Chat messages ---
         if (data.type === "chat") {
           addChatMessage(data);
@@ -98,18 +133,19 @@ export function useMeetingSocket(roomId: string, userId: string = "") {
         }
 
         // --- Handle Transcript Broadcasts (Live Captions) ---
-        if (data.type === "transcript") {
+        if (data.type === "transcript" || data.type === "TRANSCRIPT_INTERIM" || data.type === "TRANSCRIPT_FINAL") {
+          const transcriptPayload = data.payload || data;
           const transcriptions = useDraftStore.getState().transcriptions;
-          const exists = transcriptions.some((t) => t.id === data.id);
+          const exists = transcriptions.some((t) => t.id === transcriptPayload.id);
           
           if (exists) {
-            updateDraftStoreTranscription(data.id, data.text);
+            updateDraftStoreTranscription(transcriptPayload.id, transcriptPayload.text);
           } else {
             addDraftStoreTranscription({
-              id: data.id,
-              text: data.text,
-              speaker: data.speaker,
-              timestamp: data.timestamp || new Date().toLocaleTimeString(),
+              id: transcriptPayload.id,
+              text: transcriptPayload.text,
+              speaker: transcriptPayload.speaker || "Unknown",
+              timestamp: transcriptPayload.timestamp || new Date().toLocaleTimeString(),
             });
           }
           return;
@@ -182,11 +218,13 @@ export function useMeetingSocket(roomId: string, userId: string = "") {
     });
   }, [
     addChatMessage,
+    addClarification,
     addDraft,
     addDraftStoreTranscription,
     addInsight,
     incrementUnreadChat,
     removeDraft,
+    removeClarification,
     roomId,
     setIsAdmin,
     setIsLocked,

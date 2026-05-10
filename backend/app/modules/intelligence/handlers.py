@@ -14,7 +14,7 @@ This handler performs:
 
 from app.core.event_bus import bus, Event
 from app.core.constants import EventTypes
-from app.core.config import settings
+from app.core.database import db
 from app.core.logging import get_logger
 
 logger = get_logger("intelligence.handler")
@@ -43,3 +43,23 @@ async def handle_intent_requested(event: Event):
         )
     except Exception as exc:
         logger.error("Failed to enqueue intent request", exc_info=exc)
+
+
+@bus.on(EventTypes.INTENT_CLARIFICATION_REQUIRED)
+async def handle_intent_clarification_required(event: Event):
+    import json
+
+    payload = event.payload
+    if not db.pool:
+        return
+    await db.pool.execute(
+        """INSERT INTO intent_clarifications
+           (room_id, source_transcript, proposed_action, proposed_payload, confidence, requested_by)
+           VALUES ($1, $2, $3, $4::jsonb, $5, $6)""",
+        payload["room_id"],
+        payload["text"],
+        payload.get("proposed_action") or "NONE",
+        json.dumps(payload.get("proposed_payload") or {}),
+        payload.get("confidence") or 0,
+        payload.get("user_id"),
+    )

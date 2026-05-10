@@ -1,5 +1,7 @@
 import os
 import asyncpg
+import json
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from app.core.logging import get_logger
 
@@ -19,15 +21,18 @@ class Database:
                 return
 
             logger.info("Connecting to database")
+            async def init(conn):
+                await conn.set_type_codec('jsonb', encoder=json.dumps, decoder=json.loads, schema='pg_catalog')
+                await conn.set_type_codec('json', encoder=json.dumps, decoder=json.loads, schema='pg_catalog')
+
             self.pool = await asyncpg.create_pool(
                 dsn=DATABASE_URL,
                 min_size=1,
                 max_size=10,
-                # Supabase pgBouncer on port 6543 uses transaction mode
-                # which breaks prepared statements, so disable them.
                 statement_cache_size=0,
                 command_timeout=60,
-                server_settings={'statement_timeout': '60000'}
+                server_settings={'statement_timeout': '60000'},
+                init=init
             )
             logger.info("Database connected")
 
@@ -35,5 +40,21 @@ class Database:
         if self.pool:
             logger.info("Disconnecting from database")
             await self.pool.close()
+
+    @asynccontextmanager
+    async def transaction(self):
+        """
+        Provides a transaction context manager.
+        Usage:
+            async with db.transaction() as conn:
+                await conn.execute(...)
+        """
+        if not self.pool:
+            from app.core.exceptions import DatabaseUnavailableError
+            raise DatabaseUnavailableError("Database pool not initialized")
+        
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                yield conn
 
 db = Database()

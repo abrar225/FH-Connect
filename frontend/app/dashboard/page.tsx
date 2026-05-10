@@ -12,10 +12,12 @@ import ScheduleMeetingModal from "../components/dashboard/ScheduleMeetingModal";
 // Utility to generate a 9-letter code (abc-def-ghi)
 const generateMeetingId = () => {
   const chars = "abcdefghijklmnopqrstuvwxyz";
+  const randomBytes = new Uint8Array(9);
+  crypto.getRandomValues(randomBytes);
   let result = "";
   for (let i = 0; i < 9; i++) {
     if (i > 0 && i % 3 === 0) result += "-";
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    result += chars.charAt(randomBytes[i] % chars.length);
   }
   return result;
 };

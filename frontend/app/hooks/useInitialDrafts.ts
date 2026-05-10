@@ -6,7 +6,7 @@ import { useDraftStore } from "@/app/store/draftStore";
 import { authFetch } from "@/app/lib/api";
 
 export function useInitialDrafts(roomId: string) {
-  const addDraft = useDraftStore((state) => state.addDraft);
+  const hydrateRoom = useDraftStore((state) => state.hydrateRoom);
   const fetched = useRef(false);
 
   useEffect(() => {
@@ -14,10 +14,10 @@ export function useInitialDrafts(roomId: string) {
     
     async function fetchDrafts() {
       try {
-        const res = await authFetch(`/api/approval?room_id=${encodeURIComponent(roomId)}`);
+        const res = await authFetch(`/api/meeting/${encodeURIComponent(roomId)}/drafts`);
         if (res.ok) {
           const drafts = await res.json();
-          drafts.forEach((draft: any) => addDraft(draft));
+          hydrateRoom({ roomId, drafts });
         }
       } catch {
         // Drafts will still arrive over WebSocket after the connection is ready.
@@ -26,5 +26,5 @@ export function useInitialDrafts(roomId: string) {
     
     fetched.current = true;
     fetchDrafts();
-  }, [addDraft, roomId]);
+  }, [hydrateRoom, roomId]);
 }

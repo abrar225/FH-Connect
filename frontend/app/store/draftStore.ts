@@ -55,6 +55,14 @@ export interface MeetingAIHealth {
   checkedAt?: string;
 }
 
+export interface ReportStatus {
+  status: string;
+  has_report: boolean;
+  report_error?: string | null;
+  report_requested_at?: string | null;
+  ended_at?: string | null;
+}
+
 export interface MeetingInsight {
   id: string;
   room_id: string;
@@ -66,6 +74,17 @@ export interface MeetingInsight {
   status: string;
   confidence?: number;
   created_at?: string;
+}
+
+export interface IntentClarification {
+  id: string;
+  room_id: string;
+  text: string;
+  speaker?: string | null;
+  proposed_action?: string | null;
+  proposed_payload?: Partial<TaskDraft> | null;
+  confidence?: number | null;
+  status?: string;
 }
 
 export interface MeetingAgenda {
@@ -80,6 +99,21 @@ export interface MeetingAgenda {
 export type MeetingSidebarTab = "chat" | "agenda" | "insights" | "copilot" | "people";
 
 interface DraftStoreState {
+  activeRoomId: string | null;
+  enterRoom: (roomId: string) => void;
+  hydrateRoom: (snapshot: {
+    roomId: string;
+    isAdmin?: boolean;
+    isLocked?: boolean;
+    transcriptions?: TranscriptionLine[];
+    drafts?: TaskDraft[];
+    insights?: MeetingInsight[];
+    agenda?: MeetingAgenda;
+    reportStatus?: ReportStatus;
+  }) => void;
+  leaveRoom: (roomId: string) => void;
+  resetRoomState: () => void;
+
   wsStatus: "connecting" | "connected" | "disconnected" | "error";
   setWsStatus: (status: "connecting" | "connected" | "disconnected" | "error") => void;
 
@@ -119,12 +153,17 @@ interface DraftStoreState {
   updateDraft: (id: string, updates: Partial<TaskDraft>) => void;
   setActiveDraft: (id: string | null) => void;
   removeDraft: (id: string) => void;
+  clarifications: IntentClarification[];
+  addClarification: (clarification: IntentClarification) => void;
+  removeClarification: (id: string) => void;
 
   // Final Report
   report: MeetingReport | null;
   setReport: (report: MeetingReport | null) => void;
   isReportFinalized: boolean;
   setIsReportFinalized: (finalized: boolean) => void;
+  reportStatus: ReportStatus | null;
+  setReportStatus: (status: ReportStatus | null) => void;
   
   isLocked: boolean;
   setIsLocked: (isLocked: boolean) => void;
@@ -133,6 +172,7 @@ interface DraftStoreState {
   setShowCaptions: (show: boolean) => void;
 
   chatMessages: ChatMessage[];
+  setChatMessages: (messages: ChatMessage[]) => void;
   addChatMessage: (msg: ChatMessage) => void;
   unreadChatCount: number;
   incrementUnreadChat: () => void;
@@ -143,6 +183,88 @@ interface DraftStoreState {
 }
 
 export const useDraftStore = create<DraftStoreState>((set) => ({
+  activeRoomId: null,
+  resetRoomState: () => set({
+    wsStatus: "disconnected",
+    speechStatus: "stopped",
+    speechError: null,
+    transcriptions: [],
+    pulse: { status: "Waiting for conversation...", speaker_perspectives: {} },
+    aiHealth: { overall: "checking", message: "Checking AI meeting pipeline...", checks: {} },
+    agenda: { goals: [], agenda_items: [], expected_decisions: [], attendees: [], prep_docs: [] },
+    insights: [],
+    drafts: [],
+    clarifications: [],
+    activeDraftId: null,
+    report: null,
+    reportStatus: null,
+    isReportFinalized: false,
+    isLocked: false,
+    chatMessages: [],
+    unreadChatCount: 0,
+    activeTab: "chat",
+  }),
+  enterRoom: (roomId) => set((state) => {
+    if (state.activeRoomId === roomId) return state;
+    return {
+      activeRoomId: roomId,
+      wsStatus: "disconnected",
+      speechStatus: "stopped",
+      speechError: null,
+      transcriptions: [],
+      pulse: { status: "Waiting for conversation...", speaker_perspectives: {} },
+      aiHealth: { overall: "checking", message: "Checking AI meeting pipeline...", checks: {} },
+      agenda: { goals: [], agenda_items: [], expected_decisions: [], attendees: [], prep_docs: [] },
+      insights: [],
+      drafts: [],
+      clarifications: [],
+      activeDraftId: null,
+      report: null,
+      reportStatus: null,
+      isReportFinalized: false,
+      isLocked: false,
+      chatMessages: [],
+      unreadChatCount: 0,
+      activeTab: "chat",
+    };
+  }),
+  hydrateRoom: (snapshot) => set((state) => {
+    if (state.activeRoomId !== snapshot.roomId) return state;
+    return {
+      isAdmin: snapshot.isAdmin ?? state.isAdmin,
+      isLocked: snapshot.isLocked ?? state.isLocked,
+      transcriptions: snapshot.transcriptions ?? state.transcriptions,
+      drafts: snapshot.drafts ?? state.drafts,
+      insights: snapshot.insights ?? state.insights,
+      agenda: snapshot.agenda ?? state.agenda,
+      reportStatus: snapshot.reportStatus ?? state.reportStatus,
+    };
+  }),
+  leaveRoom: (roomId) => set((state) => {
+    if (state.activeRoomId !== roomId) return state;
+    return {
+      activeRoomId: null,
+      wsStatus: "disconnected",
+      speechStatus: "stopped",
+      speechError: null,
+      transcriptions: [],
+      pulse: { status: "Waiting for conversation...", speaker_perspectives: {} },
+      aiHealth: { overall: "checking", message: "Checking AI meeting pipeline...", checks: {} },
+      agenda: { goals: [], agenda_items: [], expected_decisions: [], attendees: [], prep_docs: [] },
+      insights: [],
+      drafts: [],
+      clarifications: [],
+      activeDraftId: null,
+      report: null,
+      reportStatus: null,
+      isReportFinalized: false,
+      isLocked: false,
+      chatMessages: [],
+      unreadChatCount: 0,
+      activeTab: "chat",
+    };
+  }),
+
   wsStatus: "disconnected",
   setWsStatus: (status) => set({ wsStatus: status }),
 
@@ -159,8 +281,11 @@ export const useDraftStore = create<DraftStoreState>((set) => ({
   transcriptions: [],
   addTranscription: (line) =>
     set((state) => {
-      // Deduplicate by ID
-      if (state.transcriptions.some((t) => t.id === line.id)) return state;
+      if (state.transcriptions.some((t) => t.id === line.id)) {
+        return {
+          transcriptions: state.transcriptions.map((t) => (t.id === line.id ? { ...t, ...line } : t)),
+        };
+      }
       return { transcriptions: [...state.transcriptions, line] };
     }),
   updateTranscription: (id, text) =>
@@ -206,7 +331,12 @@ export const useDraftStore = create<DraftStoreState>((set) => ({
 
   drafts: [],
   activeDraftId: null,
-  addDraft: (draft) => set((state) => ({ drafts: [...state.drafts, draft] })),
+  addDraft: (draft) => set((state) => {
+    if (state.drafts.some((item) => item.id === draft.id)) {
+      return { drafts: state.drafts.map((item) => (item.id === draft.id ? { ...item, ...draft } : item)) };
+    }
+    return { drafts: [...state.drafts, draft] };
+  }),
   updateDraft: (id, updates) =>
     set((state) => ({
       drafts: state.drafts.map((d) => (d.id === id ? { ...d, ...updates } : d)),
@@ -217,11 +347,27 @@ export const useDraftStore = create<DraftStoreState>((set) => ({
       drafts: state.drafts.filter((d) => d.id !== id),
       activeDraftId: state.activeDraftId === id ? null : state.activeDraftId,
     })),
+  clarifications: [],
+  addClarification: (clarification) => set((state) => {
+    if (state.clarifications.some((item) => item.id === clarification.id)) {
+      return {
+        clarifications: state.clarifications.map((item) =>
+          item.id === clarification.id ? { ...item, ...clarification } : item
+        ),
+      };
+    }
+    return { clarifications: [clarification, ...state.clarifications] };
+  }),
+  removeClarification: (id) => set((state) => ({
+    clarifications: state.clarifications.filter((item) => item.id !== id),
+  })),
 
   report: null,
   setReport: (report) => set({ report }),
   isReportFinalized: false,
   setIsReportFinalized: (finalized) => set({ isReportFinalized: finalized }),
+  reportStatus: null,
+  setReportStatus: (reportStatus) => set({ reportStatus }),
   
   isLocked: false,
   setIsLocked: (isLocked) => set({ isLocked }),
@@ -230,6 +376,7 @@ export const useDraftStore = create<DraftStoreState>((set) => ({
   setShowCaptions: (show) => set({ showCaptions: show }),
 
   chatMessages: [],
+  setChatMessages: (messages) => set({ chatMessages: messages }),
   addChatMessage: (msg) =>
     set((state) => {
       // Deduplicate by ID

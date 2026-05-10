@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-export default function VideoPlaceholder() {
+export default function DemoVideoPlayer() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoContRef = useRef<HTMLDivElement>(null);
 

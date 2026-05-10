@@ -25,20 +25,14 @@ export default function RoomPage() {
     async function checkMeetingAdmin() {
       if (!user) return;
       
-      // Query via backend API (bypasses Supabase RLS)
-        try {
-        const resp = await authFetch(`/debug/meeting/${roomId}`);
-        const data = await resp.json();
-        
-        if (data.error) {
+      try {
+        const resp = await authFetch(`/api/meeting/${roomId}/context`);
+        if (!resp.ok) {
           setIsInitializing(false);
           return;
         }
-
-        // Determine admin: check admins array first, then fallback to created_by
-        const admins: string[] = data.admins || [];
-        const createdBy: string = data.created_by || "";
-        const userIsAdmin = admins.includes(user.id) || createdBy === user.id;
+        const data = await resp.json();
+        const userIsAdmin = Boolean(data.is_admin);
 
         if (userIsAdmin) {
           setIsAdmin(true);

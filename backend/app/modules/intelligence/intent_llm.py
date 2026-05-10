@@ -18,10 +18,13 @@ except ImportError:
 load_dotenv()
 logger = get_logger("intelligence.intent_llm")
 
+ALL_PARTICIPANTS_ASSIGNEE = "All participants"
+
+
 class TaskIntent(BaseModel):
     action: Literal["CREATE", "UPDATE", "CANCEL", "NONE"] = Field(description="Allowed action")
     title: Optional[str] = Field(default=None, max_length=240, description="A short task title for CREATE/UPDATE")
-    assignee: Optional[str] = Field(default=None, max_length=120, description="Person assigned based STRICTLY on active_users. Null if no match.")
+    assignee: Optional[str] = Field(default=None, max_length=120, description="Person assigned based STRICTLY on active_users, or 'All participants' when the task is assigned to everyone. Null if no match.")
     deadline: Optional[str] = Field(default=None, max_length=120, description="Task deadline")
     target_task_id: Optional[str] = Field(default=None, max_length=80, description="The ID of the existing task being updated or cancelled")
     confidence: float = Field(ge=0.0, le=1.0, description="Confidence score")
@@ -175,6 +178,45 @@ def get_structured_llm(schema, user_ai_config: Optional[dict] = None):
         chain = chain.with_fallbacks(structured_models[1:])
     return chain
 
+
+def _resolve_assignee_name(assignee: Optional[str], speaker: str, active_users: list) -> Optional[str]:
+    if not assignee:
+        return assignee
+
+    normalized_assignee = assignee.strip()
+    lower_assignee = normalized_assignee.lower()
+    if lower_assignee in {
+        "all",
+        "everyone",
+        "everybody",
+        "all participants",
+        "all attendees",
+        "the team",
+        "whole team",
+        "team",
+    }:
+        return ALL_PARTICIPANTS_ASSIGNEE
+
+    active_user_by_lower = {str(user).lower(): str(user) for user in active_users}
+    speaker_match = active_user_by_lower.get(str(speaker).lower())
+    exact_match = active_user_by_lower.get(lower_assignee)
+    if exact_match:
+        return exact_match
+    if speaker_match and lower_assignee in {"me", "myself", "self", "i"}:
+        return speaker_match
+
+    for active_user in active_users:
+        active_name = str(active_user).strip()
+        lower_active_name = active_name.lower()
+        if lower_assignee and (
+            lower_assignee in lower_active_name
+            or lower_active_name in lower_assignee
+            or lower_assignee.split()[0] in lower_active_name.split()
+        ):
+            return active_name
+
+    return normalized_assignee
+
 # Create the standard intent detection chain
 llm_with_fallbacks = get_structured_llm(TaskIntent)
 
@@ -202,6 +244,8 @@ CRITICAL RULES:
 
 2. ENTITY RESOLUTION (STRICT):
 You are a strict task extraction engine. The assignee MUST perfectly match one of the names in this list: {active_users}. Auto-correct misheard names (e.g., 'Rahman' -> 'Ramesh') based on this list.
+If the transcript assigns work to everyone, all participants, the whole team, or all attendees, set assignee exactly to "All participants".
+If the speaker assigns work to themselves ("I will handle X", "I'll do X"), set assignee to the speaker name only when the speaker appears in the active users list.
 
 3. SCHEMA:
    - Always prioritize matching conversation to 'active_drafts' by ID.
@@ -249,4 +293,6 @@ async def detect_intent(transcript_text: str, speaker: str = "Unknown", active_d
         "active_drafts": drafts_context,
         "active_users": users_context
     })
+    if result.assignee:
+        result.assignee = _resolve_assignee_name(result.assignee, speaker, active_users)
     return result

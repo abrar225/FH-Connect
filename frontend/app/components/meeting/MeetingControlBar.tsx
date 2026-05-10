@@ -19,6 +19,7 @@ import {
   Hand,
   Settings,
   Languages,
+  type LucideIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDraftStore } from "@/app/store/draftStore";
@@ -33,12 +34,22 @@ interface MeetingControlBarProps {
   userId?: string;
 }
 
+interface ControlButtonProps {
+  icon: LucideIcon;
+  onClick?: () => void | Promise<void>;
+  active?: boolean;
+  danger?: boolean;
+  label: string;
+  hasMenu?: boolean;
+  onMenuClick?: () => void;
+}
+
 export default function MeetingControlBar({ isAdmin: isAdminProp = false, roomId = "", userId = "" }: MeetingControlBarProps) {
   const room = useRoomContext();
   const router = useRouter();
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } =
     useLocalParticipant();
-  const { transcriptions, drafts, setReport, showCaptions, setShowCaptions } = useDraftStore();
+  const { showCaptions, setShowCaptions } = useDraftStore();
   const storeIsAdmin = useDraftStore((state) => state.isAdmin);
   const isRoomLocked = useDraftStore((state) => state.isLocked);
   const setIsRoomLocked = useDraftStore((state) => state.setIsLocked);
@@ -117,14 +128,12 @@ export default function MeetingControlBar({ isAdmin: isAdminProp = false, roomId
       method: "POST",
       body: JSON.stringify({
         room_id: room.name,
-        transcripts: transcriptions,
-        approved_tasks: drafts
       }),
     }).catch(() => toast("error", "Report Error", "Could not generate the final report."));
 
     room.disconnect();
     router.push("/dashboard/reports");
-  }, [transcriptions, drafts, room, toast, router]);
+  }, [room, toast, router]);
 
   const ControlButton = ({ 
     icon: Icon, 
@@ -134,7 +143,7 @@ export default function MeetingControlBar({ isAdmin: isAdminProp = false, roomId
     label,
     hasMenu = false,
     onMenuClick = () => {}
-  }: any) => (
+  }: ControlButtonProps) => (
     <motion.div 
       whileHover={{ scale: 1.1, y: -4 }}
       whileTap={{ scale: 0.95 }}
@@ -217,7 +226,7 @@ export default function MeetingControlBar({ isAdmin: isAdminProp = false, roomId
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className="flex items-center space-x-3 px-4 py-3 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto relative overflow-visible"
-        ref={containerRef as any}
+        ref={containerRef}
       >
         <ControlButton 
           icon={isMicrophoneEnabled ? Mic : MicOff} 

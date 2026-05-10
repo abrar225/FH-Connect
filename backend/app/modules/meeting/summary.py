@@ -9,8 +9,7 @@ architecture rules.
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List, Optional
-from app.modules.intelligence.summary_llm import generate_summary, MeetingPulse, TranscriptionLine
-from app.modules.draft.models import TaskDraft
+from app.modules.intelligence.summary_llm import generate_summary, MeetingPulse
 from app.core.event_bus import bus, Event
 from app.core.constants import EventTypes
 from app.core.ids import new_trace_id
@@ -18,9 +17,9 @@ from app.core.logging import get_logger
 from app.core.auth import AuthUser, get_current_user, require_meeting_admin
 from app.modules.audit.repository import record_audit_event
 from app.modules.meeting.repository import get_report_status, set_report_status
+from app.modules.meeting.report_repository import list_room_drafts, list_room_transcripts
 from app.workers.report_queue import enqueue_report_event
 import json
-import os
 import asyncio
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import Field
@@ -40,8 +39,6 @@ class SummaryRequest(BaseModel):
 
 class FinalReportRequest(BaseModel):
     room_id: str
-    transcripts: List[TranscriptionLine]
-    approved_tasks: List[TaskDraft]
 
 
 class FinalReportAccepted(BaseModel):
@@ -120,14 +117,14 @@ async def meeting_ai_health(room_id: str, current_user: AuthUser = Depends(get_c
     Preflight health for the live meeting AI pipeline.
     This intentionally returns product-safe status details, not raw provider errors.
     """
-    has_transcription_token = bool(os.getenv("DEEPGRAM_TEMP_KEY") or settings.DEEPGRAM_API_KEY)
+    has_transcription_token = bool(settings.DEEPGRAM_API_KEY)
     checks: dict[str, HealthCheckItem] = {
         "auth": HealthCheckItem(ok=True, label="Authentication", detail="Supabase session verified."),
         "backend": HealthCheckItem(ok=True, label="Backend", detail="Backend API is reachable."),
         "transcription": HealthCheckItem(
             ok=has_transcription_token,
             label="Transcription",
-            detail="Deepgram token is configured." if has_transcription_token else "Deepgram API key or temporary token is not configured.",
+            detail="Deepgram API key is configured." if has_transcription_token else "Deepgram API key is not configured.",
         ),
     }
 
@@ -189,7 +186,7 @@ async def get_summary(req: SummaryRequest, current_user: AuthUser = Depends(get_
 @router.post("/meeting/end", response_model=FinalReportAccepted, status_code=status.HTTP_202_ACCEPTED)
 async def end_meeting(req: FinalReportRequest, current_user: AuthUser = Depends(get_current_user)):
     """
-    Accepts the full state of the meeting and queues the final report.
+    Queues a final report using server-owned transcripts and task drafts.
     The report worker performs the expensive LLM call and saves the result.
     """
     await require_meeting_admin(req.room_id, current_user)
@@ -202,8 +199,6 @@ async def end_meeting(req: FinalReportRequest, current_user: AuthUser = Depends(
         payload={
             "room_id": req.room_id,
             "actor_id": current_user.id,
-            "transcripts": [line.model_dump() for line in req.transcripts],
-            "approved_tasks": [task.model_dump() for task in req.approved_tasks],
         },
     ))
     if not queued:
@@ -220,9 +215,21 @@ async def end_meeting(req: FinalReportRequest, current_user: AuthUser = Depends(
         action="meeting.end_requested",
         actor_id=current_user.id,
         room_id=req.room_id,
-        metadata={"transcript_count": len(req.transcripts), "task_count": len(req.approved_tasks)},
+        metadata={"source": "server_persisted_state"},
     )
     return FinalReportAccepted(status="queued", room_id=req.room_id, trace_id=trace_id)
+
+
+@router.get("/meeting/{room_id}/transcripts")
+async def room_transcripts(room_id: str, current_user: AuthUser = Depends(get_current_user)):
+    await require_meeting_admin(room_id, current_user)
+    return await list_room_transcripts(room_id)
+
+
+@router.get("/meeting/{room_id}/drafts")
+async def room_drafts(room_id: str, current_user: AuthUser = Depends(get_current_user)):
+    await require_meeting_admin(room_id, current_user)
+    return await list_room_drafts(room_id)
 
 
 @router.get("/meeting/{room_id}/report/status", response_model=ReportStatusResponse)

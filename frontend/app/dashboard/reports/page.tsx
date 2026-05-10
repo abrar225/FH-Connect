@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertCircle, CheckCircle2, Download, FileText, Link2, Loader2, Mail, Search, Video } from "lucide-react";
+import { AlertCircle, CheckCircle2, Download, FileText, Link2, Loader2, Mail, Search, Trash2, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { API_BASE } from "@/app/lib/env";
 import { authFetch } from "@/app/lib/api";
@@ -106,6 +106,14 @@ export default function ReportsPage() {
     setMessage(data?.status === "sent" ? "Report email sent." : "Email adapter is not configured yet.");
   };
 
+  const deleteReport = async (roomId: string) => {
+    if (!window.confirm("Are you sure you want to delete this report? This action cannot be undone.")) return;
+    const res = await authFetch(`/api/reports/${roomId}`, { method: "DELETE" });
+    if (res.ok) {
+      setReports(reports.filter(r => r.room_id !== roomId));
+    }
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto h-full">
       <div className="mb-8">
@@ -158,6 +166,7 @@ export default function ReportsPage() {
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <button onClick={() => share(report.room_id)} disabled={!complete} className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-gray-300 disabled:opacity-40"><Link2 className="h-3.5 w-3.5" /> Share</button>
                   <button onClick={() => email(report.room_id)} disabled={!complete} className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-gray-300 disabled:opacity-40"><Mail className="h-3.5 w-3.5" /> Email</button>
+                  <button onClick={() => deleteReport(report.room_id)} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/20"><Trash2 className="h-3.5 w-3.5" /> Delete Report</button>
                 </div>
               </motion.div>
             );

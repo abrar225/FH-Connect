@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "./context/AuthContext";
 import SmoothScrollLayout from "../components/landing/SmoothScrollLayout";
 import Hero from "../components/landing/Hero";
-import VideoPlaceholder from "../components/landing/VideoPlaceholder";
+import DemoVideoPlayer from "../components/landing/DemoVideoPlayer";
 import Features from "../components/landing/Features";
 import CallToAction from "../components/landing/CallToAction";
 
@@ -36,7 +36,7 @@ export default function LandingPage() {
     <SmoothScrollLayout>
       <main className="relative selection:bg-white selection:text-black">
         <Hero onSignIn={signInWithGoogle} />
-        <VideoPlaceholder />
+        <DemoVideoPlayer />
         <Features />
         <CallToAction onSignIn={signInWithGoogle} />
 

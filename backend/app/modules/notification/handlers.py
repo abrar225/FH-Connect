@@ -24,6 +24,9 @@ async def handle_transcript_received_broadcast(event: Event):
     from app.gateway.ws.manager import manager
     import json
 
+    if event.payload.get("source") == "audio_worker":
+        return
+
     room_id = event.payload["room_id"]
     broadcast_json = json.dumps({
         "type": "transcript",
@@ -70,6 +73,30 @@ async def handle_draft_cancelled(event: Event):
 
     await manager.broadcast(room_id, cancel_json)
     logger.info(f"Broadcasted DRAFT_CANCELLED to room {room_id} [trace={event.trace_id[:8]}]")
+
+
+@bus.on(EventTypes.DRAFT_APPROVED)
+async def handle_draft_approved(event: Event):
+    """Broadcast a draft approval to all room participants."""
+    from app.gateway.ws.manager import manager
+
+    room_id = event.payload["room_id"]
+    broadcast_json = event.payload["broadcast_json"]
+
+    await manager.broadcast(room_id, broadcast_json)
+    logger.info(f"Broadcasted DRAFT_APPROVED to room {room_id} [trace={event.trace_id[:8]}]")
+
+
+@bus.on(EventTypes.DRAFT_REJECTED)
+async def handle_draft_rejected(event: Event):
+    """Broadcast a draft rejection to all room participants."""
+    from app.gateway.ws.manager import manager
+
+    room_id = event.payload["room_id"]
+    broadcast_json = event.payload["broadcast_json"]
+
+    await manager.broadcast(room_id, broadcast_json)
+    logger.info(f"Broadcasted DRAFT_REJECTED to room {room_id} [trace={event.trace_id[:8]}]")
 
 
 @bus.on(EventTypes.PULSE_GENERATED)
@@ -162,6 +189,28 @@ async def handle_report_status_updated(event: Event):
 
     await manager.broadcast(event.payload["room_id"], json.dumps({
         "type": "report_status",
+        "room_id": event.payload["room_id"],
         "status": event.payload["status"],
         "error": event.payload.get("error"),
+        "event_id": event.event_id,
+        "trace_id": event.trace_id,
+    }, default=str))
+
+
+@bus.on(EventTypes.INTENT_CLARIFICATION_REQUIRED)
+async def handle_intent_clarification_required(event: Event):
+    from app.gateway.ws.manager import manager
+    import json
+
+    await manager.broadcast(event.payload["room_id"], json.dumps({
+        "type": "intent_clarification_required",
+        "room_id": event.payload["room_id"],
+        "text": event.payload["text"],
+        "speaker": event.payload.get("speaker"),
+        "proposed_action": event.payload.get("proposed_action"),
+        "proposed_payload": event.payload.get("proposed_payload"),
+        "confidence": event.payload.get("confidence"),
+        "status": event.payload.get("status", "pending"),
+        "event_id": event.event_id,
+        "trace_id": event.trace_id,
     }, default=str))

@@ -10,13 +10,13 @@ interface GlassContainerProps extends HTMLMotionProps<"div"> {
   interactive?: boolean;
 }
 
-export function GlassContainer({
+export const GlassContainer = React.forwardRef<HTMLDivElement, GlassContainerProps>(function GlassContainer({
   children,
   className = "",
   intensity = "medium",
   interactive = false,
   ...props
-}: GlassContainerProps) {
+}, ref) {
   const intensityMap = {
     low: "backdrop-blur-md bg-white/[0.02] border-white/[0.05]",
     medium: "backdrop-blur-xl bg-white/[0.05] border-white/[0.08]",
@@ -29,6 +29,7 @@ export function GlassContainer({
 
   return (
     <motion.div
+      ref={ref}
       className={`relative overflow-hidden rounded-3xl border shadow-2xl shadow-black/20 ${intensityMap[intensity]} ${interactiveStyles} ${className}`}
       {...props}
     >
@@ -42,4 +43,4 @@ export function GlassContainer({
       {children}
     </motion.div>
   );
-}
+});

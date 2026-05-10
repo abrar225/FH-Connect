@@ -35,36 +35,3 @@ class TranscriptChunk(BaseModel):
     is_final: bool = True
 
 
-@router.post("/transcript", status_code=202)
-async def receive_transcript(chunk: TranscriptChunk, current_user: AuthUser = Depends(get_current_user)):
-    """
-    Accepts real-time transcript chunks from the frontend.
-
-    This endpoint is intentionally thin — it validates the payload,
-    publishes a transcript.received event, and returns immediately.
-    The heavy lifting (RBAC, AI intent detection, draft creation,
-    WebSocket broadcasting) happens asynchronously through the Event Bus.
-    """
-    trace_id = new_trace_id()
-
-    logger.info(
-        f"Transcript received → publishing event  "
-        f"[room={chunk.room_id}, speaker={chunk.speaker}, trace={trace_id[:8]}]"
-    )
-
-    await bus.emit(Event(
-        event_type=EventTypes.TRANSCRIPT_RECEIVED,
-        trace_id=trace_id,
-        meeting_id=chunk.room_id,
-        payload={
-            "id": chunk.id,
-            "text": chunk.text,
-            "speaker": chunk.speaker,
-            "user_id": current_user.id,
-            "room_id": chunk.room_id,
-            "active_users": chunk.active_users,
-            "is_final": chunk.is_final,
-        },
-    ))
-
-    return {"status": "accepted", "trace_id": trace_id}

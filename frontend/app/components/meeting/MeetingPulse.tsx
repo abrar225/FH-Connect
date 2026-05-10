@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useDraftStore } from "@/app/store/draftStore";
 import { Activity } from "lucide-react";
@@ -22,17 +22,26 @@ interface MeetingPulseProps {
 export default function MeetingPulse({ isAdmin: isAdminProp = false, roomId = "" }: MeetingPulseProps) {
   const { pulse, setPulse, transcriptions, speechStatus, aiHealth } = useDraftStore();
   const storeIsAdmin = useDraftStore((state) => state.isAdmin);
+  const latestTranscriptionsRef = useRef(transcriptions);
+  const inFlightRef = useRef(false);
+
+  useEffect(() => {
+    latestTranscriptionsRef.current = transcriptions;
+  }, [transcriptions]);
 
   // Use reactive store value (updated via WebSocket), fallback to prop
   const isAdmin = storeIsAdmin || isAdminProp;
 
   // Only admin polls for updates — results are broadcast to everyone via WebSocket
   useEffect(() => {
-    if (!isAdmin || aiHealth.overall !== "ready" || transcriptions.length === 0) return;
+    if (!isAdmin || aiHealth.overall !== "ready" || !roomId) return;
 
     const fetchSummary = async () => {
+      const currentTranscriptions = latestTranscriptionsRef.current;
+      if (inFlightRef.current || currentTranscriptions.length === 0) return;
+      inFlightRef.current = true;
       try {
-        const textOnly = transcriptions.map((t) => `${t.speaker}: ${t.text}`);
+        const textOnly = currentTranscriptions.slice(-30).map((t) => `${t.speaker}: ${t.text}`);
         const res = await authFetch("/api/summary", {
           method: "POST",
           body: JSON.stringify({ transcripts: textOnly, room_id: roomId }),
@@ -43,15 +52,18 @@ export default function MeetingPulse({ isAdmin: isAdminProp = false, roomId = ""
         }
       } catch {
         // The previous pulse remains visible until the next successful update.
+      } finally {
+        inFlightRef.current = false;
       }
     };
 
-    // Initial fetch
-    fetchSummary();
-
+    const initialTimeout = setTimeout(fetchSummary, 10000);
     const interval = setInterval(fetchSummary, 30000);
-    return () => clearInterval(interval);
-  }, [isAdmin, aiHealth.overall, transcriptions.length, setPulse, transcriptions, roomId]);
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, [isAdmin, aiHealth.overall, setPulse, roomId]);
 
   const pipelineBlocked = aiHealth.overall === "unavailable";
 

@@ -16,15 +16,15 @@ async def _request(method: str, url: str, **kwargs):
 
 def test_productivity_endpoints_require_authentication():
     endpoints = [
-        ("GET", "/api/meetings"),
-        ("GET", "/api/actions"),
-        ("GET", "/api/recordings"),
-        ("GET", "/api/reports"),
-        ("GET", "/api/settings"),
-        ("GET", "/api/integrations"),
-        ("POST", "/api/meeting/room-a/copilot"),
-        ("GET", "/api/meeting/room-a/ai-health"),
-        ("POST", "/api/reports/room-a/share"),
+        ("GET", "/v1/api/meetings"),
+        ("GET", "/v1/api/actions"),
+        ("GET", "/v1/api/recordings"),
+        ("GET", "/v1/api/reports"),
+        ("GET", "/v1/api/settings"),
+        ("GET", "/v1/api/integrations"),
+        ("POST", "/v1/api/meeting/room-a/copilot"),
+        ("GET", "/v1/api/meeting/room-a/ai-health"),
+        ("POST", "/v1/api/reports/room-a/share"),
     ]
 
     for method, url in endpoints:
@@ -116,10 +116,9 @@ def test_meeting_ai_health_reports_missing_ai_key(monkeypatch):
     monkeypatch.setattr(summary.settings, "GEMINI_API_KEY", "")
     monkeypatch.setattr(summary.settings, "GROQ_API_KEY", "")
     monkeypatch.setattr(summary.settings, "DEEPGRAM_API_KEY", "")
-    monkeypatch.delenv("DEEPGRAM_TEMP_KEY", raising=False)
 
     try:
-        response = asyncio.run(_request("GET", "/api/meeting/room-a/ai-health"))
+        response = asyncio.run(_request("GET", "/v1/api/meeting/room-a/ai-health"))
     finally:
         app.dependency_overrides.clear()
 

@@ -4,22 +4,19 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LiveKitRoom,
-  GridLayout,
   ParticipantTile,
   useTracks,
   useLocalParticipant,
-  useRoomContext,
-  useRemoteParticipants,
   RoomAudioRenderer,
+  type TrackReferenceOrPlaceholder,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track, RoomEvent, DataPacket_Kind } from "livekit-client";
+import { Track } from "livekit-client";
 import { useAuth } from "@/app/context/AuthContext";
 import TranscriptionSidebar from "./TranscriptionSidebar";
 import MeetingControlBar from "./MeetingControlBar";
 import FloatingCaptions from "./FloatingCaptions";
 import { useMeetingSocket } from "../../hooks/useMeetingSocket";
-import { useInitialDrafts } from "../../hooks/useInitialDrafts";
 import { useTranscription } from "../../hooks/useTranscription";
 import { MessageSquare, ChevronRight, ChevronLeft, Users } from "lucide-react";
 import { useDraftStore } from "../../store/draftStore";
@@ -28,6 +25,14 @@ import FeatureSidebar from "./FeatureSidebar";
 
 const LIVEKIT_URL = process.env.NEXT_PUBLIC_LIVEKIT_URL || "";
 import { authFetch } from "@/app/lib/api";
+
+function trackReferenceKey(trackRef: TrackReferenceOrPlaceholder) {
+  const ref = trackRef as any;
+  const participantId = ref.participant?.identity || "participant";
+  const source = ref.source || "track";
+  const trackSid = ref.publication?.trackSid || ref.publication?.track?.sid || "placeholder";
+  return `${participantId}_${source}_${trackSid}`;
+}
 
 function VideoStage() {
   const tracks = useTracks(
@@ -40,16 +45,20 @@ function VideoStage() {
 
   return (
     <motion.div layout className="flex-1 h-full p-4 relative min-w-0">
-      <GridLayout
-        tracks={tracks}
+      <div
+        className="grid h-[calc(100%-120px)] min-h-[240px] gap-3 overflow-hidden rounded-3xl"
         style={{
-          height: "calc(100% - 120px)",
-          borderRadius: "1.5rem",
-          overflow: "hidden",
+          gridTemplateColumns: `repeat(${tracks.length > 1 ? 2 : 1}, minmax(0, 1fr))`,
         }}
       >
-        <ParticipantTile />
-      </GridLayout>
+        {tracks.map((trackRef) => (
+          <ParticipantTile
+            key={trackReferenceKey(trackRef)}
+            trackRef={trackRef}
+            className="min-h-0 overflow-hidden rounded-3xl bg-black/20"
+          />
+        ))}
+      </div>
     </motion.div>
   );
 }
@@ -70,6 +79,7 @@ export default function MeetingRoom({
   displayName = `User-${Math.random().toString(36).substring(2, 6)}`
 }: MeetingRoomProps) {
   const [token, setToken] = useState<string>("");
+  const [livekitUrl, setLivekitUrl] = useState<string>(LIVEKIT_URL);
   const [isConnected, setIsConnected] = useState(false);
   const [permissionsGranted, setPermissionsGranted] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
@@ -85,10 +95,17 @@ export default function MeetingRoom({
   const [sessionIdentity] = useState(() => user?.id || "");
   const userId = sessionIdentity;
 
-  const addTranscription = useDraftStore((state) => state.addTranscription);
   const setStoreAdmin = useDraftStore((state) => state.setIsAdmin);
   const setStoreUserId = useDraftStore((state) => state.setUserId);
   const setAIHealth = useDraftStore((state) => state.setAIHealth);
+  const enterRoom = useDraftStore((state) => state.enterRoom);
+  const hydrateRoom = useDraftStore((state) => state.hydrateRoom);
+  const leaveRoom = useDraftStore((state) => state.leaveRoom);
+
+  useEffect(() => {
+    enterRoom(roomId);
+    return () => leaveRoom(roomId);
+  }, [enterRoom, leaveRoom, roomId]);
 
   // Sync admin state and userId into the global store
   useEffect(() => {
@@ -96,9 +113,53 @@ export default function MeetingRoom({
     setStoreUserId(userId);
   }, [isAdmin, userId, setStoreAdmin, setStoreUserId]);
 
+  const setChatMessages = useDraftStore((state) => state.setChatMessages);
+
   // Initialize real-time drafts pipeline
   const { ws } = useMeetingSocket(roomId, userId);
-  useInitialDrafts(roomId);
+
+  useEffect(() => {
+    let alive = true;
+    async function hydrate() {
+      try {
+        const [contextRes, transcriptsRes, draftsRes, statusRes, chatRes] = await Promise.all([
+          authFetch(`/api/meeting/${roomId}/context`),
+          authFetch(`/api/meeting/${roomId}/transcripts`),
+          authFetch(`/api/meeting/${roomId}/drafts`),
+          authFetch(`/api/meeting/${roomId}/report/status`),
+          authFetch(`/api/meeting/${roomId}/chat`),
+        ]);
+        if (!alive) return;
+        const context = contextRes.ok ? await contextRes.json() : {};
+        const transcripts = transcriptsRes.ok ? await transcriptsRes.json() : [];
+        const drafts = draftsRes.ok ? await draftsRes.json() : [];
+        const reportStatus = statusRes.ok ? await statusRes.json() : null;
+        const chats = chatRes.ok ? await chatRes.json() : [];
+        hydrateRoom({
+          roomId,
+          isAdmin: Boolean(context.is_admin ?? isAdmin),
+          isLocked: Boolean(context.is_locked),
+          transcriptions: transcripts.map((line: any) => ({
+            id: String(line.id),
+            text: line.text,
+            speaker: line.speaker || "Unknown",
+            timestamp: line.spoken_at || line.timestamp || "",
+          })),
+          drafts,
+          reportStatus,
+        });
+        if (chats.length > 0) {
+          setChatMessages(chats);
+        }
+      } catch {
+        // Live websocket events will continue to populate the room projection.
+      }
+    }
+    hydrate();
+    return () => {
+      alive = false;
+    };
+  }, [hydrateRoom, isAdmin, roomId]);
 
   // Step 1: Request BOTH camera AND microphone permissions upfront
   const requestPermissions = useCallback(async () => {
@@ -135,7 +196,12 @@ export default function MeetingRoom({
         throw new Error("Token fetch failed");
       }
       const data = await res.json();
+      const roomUrl = data.url || LIVEKIT_URL;
+      if (!roomUrl) {
+        throw new Error("LiveKit URL is not configured.");
+      }
       setToken(data.token);
+      setLivekitUrl(roomUrl);
     } catch (e: any) {
       setPermissionError(e.message || "Failed to join meeting room.");
     }
@@ -334,7 +400,7 @@ export default function MeetingRoom({
               video={initialCamEnabled}
               audio={initialMicEnabled}
               token={token}
-              serverUrl={LIVEKIT_URL}
+              serverUrl={livekitUrl}
               data-lk-theme="default"
               onConnected={() => setIsConnected(true)}
               onDisconnected={() => setIsConnected(false)}
@@ -361,13 +427,7 @@ export default function MeetingRoom({
               <VideoStage />
               <RoomAudioRenderer />
               <MeetingControlBar isAdmin={isAdmin} roomId={roomId} userId={userId} />
-              <TranscriptionAgent 
-                participantName={participantName} 
-                userId={userId} 
-                roomId={roomId} 
-              />
-              <DataSubscriber />
-
+              <TranscriptionAgent />
               <FloatingCaptions />
 
               {/* Right Sidebar: AI Intelligence */}
@@ -395,66 +455,9 @@ export default function MeetingRoom({
   );
 }
 
-/** Invisible component that captures speech and sends it to the backend.
- *  Lives inside <LiveKitRoom> so it can read the local participant's mic state. */
-function TranscriptionAgent({ participantName, userId, roomId }: { participantName: string, userId: string, roomId: string }) {
-  const { isMicrophoneEnabled, localParticipant } = useLocalParticipant();
-  const remoteParticipants = useRemoteParticipants();
-  
-  const activeUsers = [
-    localParticipant.name || participantName,
-    ...remoteParticipants.map(p => p.name || p.identity)
-  ].filter(Boolean);
-  
-  const handleTranscript = useCallback((text: string) => {
-    const data = JSON.stringify({
-      type: "transcription",
-      text,
-      speaker: participantName
-    });
-    const encoder = new TextEncoder();
-    localParticipant.publishData(encoder.encode(data), {
-      reliable: true
-    });
-  }, [localParticipant, participantName]);
-
-  useTranscription(isMicrophoneEnabled, participantName, userId, roomId, activeUsers, handleTranscript);
+/** Invisible component that binds microphone state to UI transcript status */
+function TranscriptionAgent() {
+  const { isMicrophoneEnabled } = useLocalParticipant();
+  useTranscription(isMicrophoneEnabled);
   return null;
-}
-
-
-/** Component that listens for data messages within the room */
-function DataSubscriber() {
-    const room = useRoomContext();
-    const addTranscription = useDraftStore((state) => state.addTranscription);
-
-    useEffect(() => {
-        if (!room) return;
-
-        const handleData = (payload: Uint8Array, participant: any) => {
-            const dataStr = new TextDecoder().decode(payload);
-            try {
-                const data = JSON.parse(dataStr);
-                if (data.type === "transcription") {
-                    addTranscription({
-                        id: crypto.randomUUID(),
-                        text: data.text,
-                        speaker: data.speaker,
-                        timestamp: new Date().toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                        }),
-                    });
-                }
-            } catch (e) {}
-        };
-
-        room.on(RoomEvent.DataReceived, handleData);
-        return () => {
-            room.off(RoomEvent.DataReceived, handleData);
-        };
-    }, [room, addTranscription]);
-
-    return null;
 }

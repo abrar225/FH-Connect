@@ -111,12 +111,13 @@ def test_livekit_token_uses_authenticated_user_not_query_user_id(monkeypatch):
     monkeypatch.setenv("LIVEKIT_API_SECRET", "devsecret-devsecret-devsecret-devsecret")
     monkeypatch.setenv("LIVEKIT_URL", "wss://livekit.example.test")
     monkeypatch.setattr(db, "pool", None)
+    monkeypatch.setattr("app.modules.media.livekit.start_worker_if_needed", lambda *args, **kwargs: None)
 
     async def run_request():
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
             return await client.get(
-                "/api/livekit/token?room_name=room-a&participant_name=Tester&user_id=attacker"
+                "/v1/api/livekit/token?room_name=room-a&participant_name=Tester&user_id=attacker"
             )
 
     try:

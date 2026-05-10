@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, ClipboardCopy, FileText, Search, Video } from "lucide-react";
+import { CalendarPlus, ClipboardCopy, FileText, Search, Trash2, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { authFetch } from "@/app/lib/api";
 import { safeCopyText } from "@/app/lib/clipboard";
@@ -53,6 +53,14 @@ export default function MeetingsPage() {
 
   const copyLink = async (roomId: string) => {
     await safeCopyText(`${window.location.origin}/room/${roomId}`);
+  };
+
+  const deleteMeeting = async (roomId: string) => {
+    if (!window.confirm("Are you sure you want to delete this meeting? This action cannot be undone.")) return;
+    const res = await authFetch(`/api/meetings/${roomId}`, { method: "DELETE" });
+    if (res.ok) {
+      setMeetings(meetings.filter(m => m.room_id !== roomId));
+    }
   };
 
   return (
@@ -108,6 +116,7 @@ export default function MeetingsPage() {
                   <button onClick={() => router.push(`/room/${meeting.room_id}`)} className="rounded-lg bg-primary/20 px-3 py-2 text-xs font-semibold text-primary">Join</button>
                   <button onClick={() => copyLink(meeting.room_id)} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-gray-300 inline-flex items-center gap-1.5"><ClipboardCopy className="h-3.5 w-3.5" /> Copy</button>
                   {meeting.has_report && <button onClick={() => router.push("/dashboard/reports")} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-gray-300 inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5" /> Report</button>}
+                  <button onClick={() => deleteMeeting(meeting.room_id)} className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-400 inline-flex items-center gap-1.5 hover:bg-red-500/20"><Trash2 className="h-3.5 w-3.5" /> Delete</button>
                 </div>
               </div>
             </motion.div>

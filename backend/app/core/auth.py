@@ -13,7 +13,21 @@ from app.core.logging import get_logger
 
 logger = get_logger("auth")
 _CACHE_TTL_SECONDS = 60
+_MAX_CACHE_SIZE = 1000
 _user_cache: Dict[str, tuple[float, "AuthUser"]] = {}
+
+
+def _evict_expired_cache() -> None:
+    """Remove expired entries from the auth cache to prevent unbounded growth."""
+    now = time.time()
+    expired_keys = [k for k, (expiry, _) in _user_cache.items() if expiry <= now]
+    for k in expired_keys:
+        del _user_cache[k]
+    # If still over limit after expiry sweep, remove oldest entries
+    if len(_user_cache) > _MAX_CACHE_SIZE:
+        sorted_keys = sorted(_user_cache.keys(), key=lambda k: _user_cache[k][0])
+        for k in sorted_keys[: len(_user_cache) - _MAX_CACHE_SIZE]:
+            del _user_cache[k]
 
 
 @dataclass(frozen=True)
@@ -78,6 +92,11 @@ async def verify_supabase_token(token: str) -> AuthUser:
 
     user = await asyncio.to_thread(_fetch_supabase_user, token)
     _user_cache[token] = (now + _CACHE_TTL_SECONDS, user)
+
+    # Lazy eviction: only sweep when cache exceeds max size
+    if len(_user_cache) > _MAX_CACHE_SIZE:
+        _evict_expired_cache()
+
     return user
 
 
@@ -99,6 +118,6 @@ async def get_websocket_user(websocket: WebSocket) -> Optional[AuthUser]:
 
 
 async def require_meeting_admin(room_id: str, user: AuthUser) -> None:
-    from app.modules.meeting.permissions import require_admin
+    from app.core.permissions import Capability, require_capability
 
-    await require_admin(room_id, user)
+    await require_capability(user, Capability.MEETING_ADMIN, {"room_id": room_id})

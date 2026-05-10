@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { API_BASE, getWsUrl } from "@/app/lib/env";
+import { getApiUrl, getWsUrl } from "@/app/lib/env";
 
 const SESSION_TIMEOUT_MS = 5000;
 const FETCH_TIMEOUT_MS = 15000;
@@ -37,7 +37,7 @@ export async function authFetch(input: string, init: RequestInit = {}) {
   const timeoutId = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    return await fetch(input.startsWith("http") ? input : `${API_BASE}${input}`, {
+    return await fetch(input.startsWith("http") ? input : getApiUrl(input), {
       ...init,
       headers,
       signal: init.signal || controller.signal,

@@ -98,16 +98,34 @@ class EventBus:
 
     async def _listen_redis(self):
         """Background task to listen for events from Redis."""
-        try:
-            async for message in self._pubsub.listen():
-                if message["type"] == "message":
-                    event_data = json.loads(message["data"])
-                    event = Event(**event_data)
-                    await self._handle_local(event, from_redis=True)
-        except asyncio.CancelledError:
-            logger.info("Redis listener cancelled")
-        except Exception as e:
-            logger.error(f"Redis listen error: {e}", exc_info=True)
+        retry_delay = 1
+        while True:
+            try:
+                if self._pubsub.connection is None:
+                    await self._pubsub.subscribe(self._channel)
+                async for message in self._pubsub.listen():
+                    if message["type"] == "message":
+                        event_data = json.loads(message["data"])
+                        event = Event(**event_data)
+                        
+                        # Idempotency Check for Redis deliveries
+                        if event.event_id in self._processed_events:
+                            continue
+                            
+                        self._processed_events.add(event.event_id)
+                        if len(self._processed_events) > self._max_processed_cache:
+                            evict_count = self._max_processed_cache // 2
+                            self._processed_events = set(list(self._processed_events)[evict_count:])
+                            
+                        await self._handle_local(event, from_redis=True)
+                await asyncio.sleep(retry_delay)
+            except asyncio.CancelledError:
+                logger.info("Redis listener cancelled")
+                break
+            except Exception as e:
+                logger.error(f"Redis listen error: {e}. Reconnecting in {retry_delay}s...")
+                await asyncio.sleep(retry_delay)
+                retry_delay = min(retry_delay * 2, 30)
 
     # ── Subscribe ─────────────────────────────────────────────────────────
 
@@ -140,6 +158,8 @@ class EventBus:
             EventTypes.INSIGHT_UPDATED,
             EventTypes.REPORT_STATUS_UPDATED,
             EventTypes.QUALITY_SCORE_UPDATED,
+            EventTypes.INTENT_CLARIFICATION_REQUIRED,
+            EventTypes.CHAT_BROADCAST,
         }
 
         # Local fallback Idempotency Check
@@ -163,9 +183,9 @@ class EventBus:
             # Publish to Redis channel (which our own listener will pick up)
             logger.debug(f"Publishing to Redis: {event.event_type} [event={event.event_id[:8]}]")
             await self._redis.publish(self._channel, event.model_dump_json())
-        else:
-            # Process locally
-            await self._handle_local(event, from_redis=False)
+
+        # Process locally (if it was published to Redis, the listener will skip the echo via _processed_events)
+        await self._handle_local(event, from_redis=False)
 
     async def _handle_local(self, event: Event, from_redis: bool = False):
         """Invoke all local handlers for the event."""

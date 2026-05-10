@@ -1,12 +1,12 @@
-from typing import Optional
 from app.modules.intelligence.intent_llm import TaskIntent
 from app.modules.draft.models import TaskDraft
+from app.core.config import settings
 
 def process_intent(intent_result: TaskIntent, original_transcript: str, room_id: str):
     """
     Validates the AI intent and returns (action, payload).
     """
-    if intent_result.confidence < 0.7:
+    if intent_result.confidence < settings.INTENT_CONFIDENCE_THRESHOLD:
         return None, None
 
     action = intent_result.action.upper()

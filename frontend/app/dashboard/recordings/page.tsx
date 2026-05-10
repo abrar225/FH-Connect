@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Download, FileText, Search, Timer } from "lucide-react";
+import { Download, FileText, Search, Timer, Trash2 } from "lucide-react";
 import { authFetch } from "@/app/lib/api";
 
 type RecordingRow = {
@@ -67,6 +67,18 @@ export default function RecordingsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const deleteRecording = async (roomId: string) => {
+    if (!window.confirm("Are you sure you want to delete this recording and all its transcripts? This action cannot be undone.")) return;
+    const res = await authFetch(`/api/recordings/${roomId}`, { method: "DELETE" });
+    if (res.ok) {
+      setRecordings(recordings.filter(r => r.room_id !== roomId));
+      if (selected?.room_id === roomId) {
+        setSelected(null);
+        setTranscript([]);
+      }
+    }
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto h-full">
       <div className="mb-8">
@@ -82,12 +94,17 @@ export default function RecordingsPage() {
             <div className="rounded-xl border border-white/10 bg-surface/30 p-6 text-gray-400">No transcript recordings yet.</div>
           ) : recordings.map((recording) => (
             <button key={recording.room_id} onClick={() => setSelected(recording)} className={`w-full rounded-xl border p-4 text-left transition-colors ${selected?.room_id === recording.room_id ? "border-primary/40 bg-primary/10" : "border-white/10 bg-surface/40 hover:bg-surface/60"}`}>
-              <div className="flex items-center gap-3">
-                <Timer className="h-5 w-5 text-amber-300" />
-                <div className="min-w-0">
-                  <h2 className="truncate text-sm font-semibold text-white">{recording.title || "Meeting"}</h2>
-                  <p className="mt-1 font-mono text-xs text-gray-500">{recording.room_id}</p>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Timer className="h-5 w-5 text-amber-300" />
+                  <div className="min-w-0">
+                    <h2 className="truncate text-sm font-semibold text-white">{recording.title || "Meeting"}</h2>
+                    <p className="mt-1 font-mono text-xs text-gray-500">{recording.room_id}</p>
+                  </div>
                 </div>
+                <button onClick={(e) => { e.stopPropagation(); deleteRecording(recording.room_id); }} className="rounded-lg p-1.5 text-red-400 hover:bg-red-500/20">
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
               <p className="mt-3 text-xs text-gray-400">{recording.transcript_count} transcript lines{recording.has_report ? " · report linked" : ""}</p>
             </button>
