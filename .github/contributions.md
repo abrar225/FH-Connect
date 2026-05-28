@@ -62,3 +62,4 @@
 - [2026-05-19T21:01:59] style: improve code formatting and comments
 - [2026-05-21T15:59:41] fix: correct minor typo in logging output
 - [2026-05-26T14:20:30] chore: update dependencies and environment config
+- [2026-05-28T15:26:54] test: expand test coverage for utility modules
