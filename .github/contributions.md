@@ -66,3 +66,4 @@
 - [2026-06-02T20:47:25] fix: correct minor typo in logging output
 - [2026-06-04T10:27:28] fix: resolve edge cases in parameter validation
 - [2026-06-06T13:06:37] fix: resolve edge cases in parameter validation
+- [2026-06-06T17:37:29] perf: improve execution speed in hot paths
