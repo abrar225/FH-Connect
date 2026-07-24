@@ -88,3 +88,4 @@ Developed with ❤️ by the FireHox Team.
 <!-- [2026-06-01T21:24:20] docs(readme): update project documentation and overview -->
 <!-- [2026-06-14T21:38:50] docs(readme): update project documentation and overview -->
 <!-- [2026-07-13T14:41:32] style: improve formatting and badge alignment -->
+<!-- [2026-07-24T18:11:50] docs(readme): update project documentation and overview -->
